@@ -1,0 +1,149 @@
+{
+  "format": "pyxis.map",
+  "version": 1,
+  "project": {
+    "id": "demo",
+    "title": "Pyxis Demo"
+  },
+  "run": {
+    "id": "fixture-run",
+    "created_at": "2026-01-01T00:00:00Z",
+    "provenance": {
+      "fixtureVersion": "1"
+    }
+  },
+  "domains": [
+    {
+      "id": "main",
+      "title": "Main",
+      "order": 0
+    }
+  ],
+  "states": [
+    {
+      "id": "home.ready",
+      "screen_id": "home",
+      "domain_id": "main",
+      "title": "Home",
+      "label": "",
+      "order": 0,
+      "metadata": {
+        "é": "first",
+        "é": "second"
+      }
+    },
+    {
+      "id": "detail.ready",
+      "screen_id": "detail",
+      "domain_id": "main",
+      "title": "Detail",
+      "label": "",
+      "order": 1,
+      "metadata": {}
+    },
+    {
+      "id": "settings.ready",
+      "screen_id": "settings",
+      "domain_id": "main",
+      "title": "Settings",
+      "label": "",
+      "order": 2,
+      "metadata": {}
+    }
+  ],
+  "profiles": [
+    {
+      "id": "light",
+      "title": "Light",
+      "requested": {
+        "color_scheme": "light",
+        "accessibility.color_filters": "grayscale"
+      }
+    }
+  ],
+  "observations": [
+    {
+      "id": "o_demo",
+      "journey_id": "navigation",
+      "title": "Home to detail",
+      "test_name": "testNavigation",
+      "profile_id": "light",
+      "status": "failed",
+      "variants": {
+        "color_scheme": {
+          "status": "applied",
+          "value": "light"
+        },
+        "accessibility.color_filters": {
+          "status": "unsupported",
+          "reason": "Display filter pixels are not verified"
+        }
+      },
+      "failure": "Synthetic timeout"
+    }
+  ],
+  "captures": [
+    {
+      "id": "c_0",
+      "state_id": "home.ready",
+      "observation_id": "o_demo",
+      "sequence": 0,
+      "asset": {
+        "path": "assets/example.png",
+        "sha256": "354f95408b31a4661481f8e307e27966bfea8bac7244e175ddcf8a8d9d565230",
+        "media_type": "image/png",
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "c_1",
+      "state_id": "detail.ready",
+      "observation_id": "o_demo",
+      "sequence": 2,
+      "asset": {
+        "path": "assets/example.png",
+        "sha256": "354f95408b31a4661481f8e307e27966bfea8bac7244e175ddcf8a8d9d565230",
+        "media_type": "image/png",
+        "width": 2,
+        "height": 2
+      }
+    },
+    {
+      "id": "c_2",
+      "state_id": "detail.ready",
+      "observation_id": "o_demo",
+      "sequence": 3,
+      "asset": {
+        "path": "assets/example.png",
+        "sha256": "354f95408b31a4661481f8e307e27966bfea8bac7244e175ddcf8a8d9d565230",
+        "media_type": "image/png",
+        "width": 2,
+        "height": 2
+      }
+    }
+  ],
+  "transitions": [
+    {
+      "id": "t_success",
+      "observation_id": "o_demo",
+      "from_state_id": "home.ready",
+      "to_state_id": "detail.ready",
+      "action": "Open detail",
+      "kind": "push",
+      "sequence": 1,
+      "status": "succeeded"
+    },
+    {
+      "id": "t_failure",
+      "observation_id": "o_demo",
+      "from_state_id": "detail.ready",
+      "to_state_id": "settings.ready",
+      "action": "Open settings",
+      "kind": "present",
+      "sequence": 4,
+      "status": "failed",
+      "failure": "Synthetic timeout"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+.build/
+.swiftpm/
+build/
+artifacts/
+.generated/
+*.xcresult/
+*.xcresult.log
+.DS_Store
+DerivedData/

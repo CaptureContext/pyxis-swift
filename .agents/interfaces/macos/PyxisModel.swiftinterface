@@ -1,0 +1,523 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)
+// swift-module-flags: -target arm64-apple-macos14.0 -enable-objc-interop -language-mode 6 -O -enable-experimental-feature DebugDescriptionMacro -module-name PyxisModel -package-name pyxis_swift
+// swift-module-flags-ignorable:  -formal-cxx-interoperability-mode=off -interface-compiler-version 6.4
+import Foundation
+import OrderedCollections
+import Swift
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+public struct PyxisArtifact : Swift::Codable, Swift::Equatable, Swift::Sendable {
+  public var format: Swift::String
+  public var version: Swift::Int
+  public var type: PyxisModel::PyxisArtifactType
+  @inlinable public init(format: Swift::String = "pyxis.artifact", version: Swift::Int = 1, type: PyxisModel::PyxisArtifactType = .regular) {
+		self.format = format
+		self.version = version
+		self.type = type
+	}
+  public init(data: Foundation::Data) throws
+  public func validate() throws
+  public func encoded() throws -> Foundation::Data
+  @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisModel::PyxisArtifact, _ b: PyxisModel::PyxisArtifact) -> Swift::Bool
+  public func encode(to encoder: any Swift::Encoder) throws
+  public init(from decoder: any Swift::Decoder) throws
+}
+public enum PyxisArtifactType : Swift::String, Swift::Codable, Swift::Sendable {
+  case regular
+  @inlinable public init?(rawValue: Swift::String)
+  public typealias RawValue = Swift::String
+  public var rawValue: Swift::String {
+    @inlinable get
+  }
+}
+public struct PyxisAsset : Swift::Codable, Swift::Equatable, Swift::Sendable {
+  public var path: Swift::String
+  @_hasInitialValue public var sha256: Swift::String?
+  public var mediaType: PyxisModel::PyxisMediaType
+  public var width: Swift::Int
+  public var height: Swift::Int
+  @inlinable public init(path: Swift::String, sha256: Swift::String? = nil, mediaType: PyxisModel::PyxisMediaType = .png, width: Swift::Int, height: Swift::Int) {
+		self.path = path
+		self.sha256 = sha256
+		self.mediaType = mediaType
+		self.width = width
+		self.height = height
+	}
+  public init(from decoder: any Swift::Decoder) throws
+  @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisModel::PyxisAsset, _ b: PyxisModel::PyxisAsset) -> Swift::Bool
+  public func encode(to encoder: any Swift::Encoder) throws
+}
+public struct PyxisCapture : Swift::Codable, Swift::Equatable, Swift::Sendable {
+  public var id: Swift::String
+  public var stateID: Swift::String
+  public var observationID: Swift::String
+  public var sequence: Swift::Int
+  public var asset: PyxisModel::PyxisAsset
+  @inlinable public init(id: Swift::String, stateID: Swift::String, observationID: Swift::String, sequence: Swift::Int, asset: PyxisModel::PyxisAsset) {
+		self.id = id
+		self.stateID = stateID
+		self.observationID = observationID
+		self.sequence = sequence
+		self.asset = asset
+	}
+  @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisModel::PyxisCapture, _ b: PyxisModel::PyxisCapture) -> Swift::Bool
+  public func encode(to encoder: any Swift::Encoder) throws
+  public init(from decoder: any Swift::Decoder) throws
+}
+public enum PyxisDocumentFormat : Swift::String, Swift::Codable, Swift::Sendable {
+  case map
+  case fragment
+  @inlinable public init?(rawValue: Swift::String)
+  public typealias RawValue = Swift::String
+  public var rawValue: Swift::String {
+    @inlinable get
+  }
+}
+public struct PyxisDomain : Swift::Codable, Swift::Equatable, Swift::Sendable {
+  public var id: Swift::String
+  public var title: Swift::String
+  public var order: Swift::Int
+  @inlinable public init(id: Swift::String, title: Swift::String, order: Swift::Int = 0) {
+		self.id = id
+		self.title = title
+		self.order = order
+	}
+  @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisModel::PyxisDomain, _ b: PyxisModel::PyxisDomain) -> Swift::Bool
+  public func encode(to encoder: any Swift::Encoder) throws
+  public init(from decoder: any Swift::Decoder) throws
+}
+public enum PyxisJSON {
+  public static func decode(_ data: Foundation::Data) throws -> PyxisModel::PyxisMapDocument
+  public static func encode(_ document: PyxisModel::PyxisMapDocument) throws -> Foundation::Data
+}
+public struct PyxisMapDocument : Swift::Codable, Swift::Equatable, Swift::Sendable {
+  public var format: PyxisModel::PyxisDocumentFormat
+  public var version: Swift::Int
+  public var project: PyxisModel::PyxisProject
+  public var run: PyxisModel::PyxisRunMetadata
+  public var recordingRuns: [PyxisModel::PyxisRunMetadata]
+  public var domains: [PyxisModel::PyxisDomain]
+  public var states: [PyxisModel::PyxisState]
+  public var profiles: [PyxisModel::PyxisProfile]
+  public var observations: [PyxisModel::PyxisObservation]
+  public var captures: [PyxisModel::PyxisCapture]
+  public var transitions: [PyxisModel::PyxisTransition]
+  @inlinable public init(format: PyxisModel::PyxisDocumentFormat = .map, version: Swift::Int = 1, project: PyxisModel::PyxisProject, run: PyxisModel::PyxisRunMetadata, domains: [PyxisModel::PyxisDomain] = [], states: [PyxisModel::PyxisState] = [], profiles: [PyxisModel::PyxisProfile] = [], observations: [PyxisModel::PyxisObservation] = [], captures: [PyxisModel::PyxisCapture] = [], transitions: [PyxisModel::PyxisTransition] = [], recordingRuns: [PyxisModel::PyxisRunMetadata] = []) {
+		self.format = format
+		self.version = version
+		self.project = project
+		self.run = run
+		self.recordingRuns = recordingRuns
+		self.domains = domains
+		self.states = states
+		self.profiles = profiles
+		self.observations = observations
+		self.captures = captures
+		self.transitions = transitions
+	}
+  public init(from decoder: any Swift::Decoder) throws
+  public func recordingRun(for observation: PyxisModel::PyxisObservation) -> PyxisModel::PyxisRunMetadata?
+  @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisModel::PyxisMapDocument, _ b: PyxisModel::PyxisMapDocument) -> Swift::Bool
+  public func encode(to encoder: any Swift::Encoder) throws
+}
+public enum PyxisMediaType : Swift::String, Swift::Codable, Swift::Sendable {
+  case png
+  case jpeg
+  @inlinable public init?(rawValue: Swift::String)
+  public typealias RawValue = Swift::String
+  public var rawValue: Swift::String {
+    @inlinable get
+  }
+}
+public struct PyxisObservation : Swift::Codable, Swift::Equatable, Swift::Sendable {
+  public var id: Swift::String
+  public var journeyID: Swift::String
+  public var title: Swift::String
+  public var testName: Swift::String
+  public var profileID: Swift::String
+  public var status: PyxisModel::PyxisObservationStatus
+  public var variants: [Swift::String : PyxisModel::PyxisVariantResult]
+  @_hasInitialValue public var startedAt: Foundation::Date?
+  @_hasInitialValue public var failure: Swift::String?
+  @_hasInitialValue public var runID: Swift::String?
+  @inlinable public init(id: Swift::String, journeyID: Swift::String, title: Swift::String, testName: Swift::String, profileID: Swift::String, status: PyxisModel::PyxisObservationStatus = .incomplete, variants: [Swift::String : PyxisModel::PyxisVariantResult] = [:], startedAt: Foundation::Date? = nil, failure: Swift::String? = nil, runID: Swift::String? = nil) {
+		self.id = id
+		self.journeyID = journeyID
+		self.title = title
+		self.testName = testName
+		self.profileID = profileID
+		self.status = status
+		self.variants = variants
+		self.startedAt = startedAt
+		self.failure = failure
+		self.runID = runID
+	}
+  public init(from decoder: any Swift::Decoder) throws
+  public func encode(to encoder: any Swift::Encoder) throws
+  @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisModel::PyxisObservation, _ b: PyxisModel::PyxisObservation) -> Swift::Bool
+}
+public enum PyxisObservationStatus : Swift::String, Swift::Codable, Swift::Sendable {
+  case passed
+  case failed
+  case incomplete
+  @inlinable public init?(rawValue: Swift::String)
+  public typealias RawValue = Swift::String
+  public var rawValue: Swift::String {
+    @inlinable get
+  }
+}
+public struct PyxisProfile : Swift::Codable, Swift::Equatable, Swift::Sendable {
+  public var id: Swift::String
+  public var title: Swift::String
+  public var requested: PyxisModel::PyxisVariants
+  public var order: Swift::Int
+  @inlinable public init(id: Swift::String, title: Swift::String, requested: PyxisModel::PyxisVariants = [:], order: Swift::Int = 0) {
+		self.id = id
+		self.title = title
+		self.requested = requested
+		self.order = order
+	}
+  public init(from decoder: any Swift::Decoder) throws
+  @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisModel::PyxisProfile, _ b: PyxisModel::PyxisProfile) -> Swift::Bool
+  public func encode(to encoder: any Swift::Encoder) throws
+}
+public struct PyxisProject : Swift::Codable, Swift::Equatable, Swift::Sendable {
+  public var id: Swift::String
+  public var title: Swift::String
+  @inlinable public init(id: Swift::String, title: Swift::String) {
+		self.id = id
+		self.title = title
+	}
+  @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisModel::PyxisProject, _ b: PyxisModel::PyxisProject) -> Swift::Bool
+  public func encode(to encoder: any Swift::Encoder) throws
+  public init(from decoder: any Swift::Decoder) throws
+}
+public struct PyxisRunMetadata : Swift::Codable, Swift::Equatable, Swift::Sendable {
+  public var id: Swift::String
+  public var createdAt: Foundation::Date
+  public var provenance: [Swift::String : Swift::String]
+  @inlinable public init(id: Swift::String, createdAt: Foundation::Date, provenance: [Swift::String : Swift::String] = [:]) {
+		self.id = id
+		self.createdAt = createdAt
+		self.provenance = provenance
+	}
+  public init(from decoder: any Swift::Decoder) throws
+  public func encode(to encoder: any Swift::Encoder) throws
+  @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisModel::PyxisRunMetadata, _ b: PyxisModel::PyxisRunMetadata) -> Swift::Bool
+}
+public struct PyxisState : Swift::Codable, Swift::Equatable, Swift::Sendable {
+  public var id: Swift::String
+  public var screenID: Swift::String
+  public var domainID: Swift::String
+  public var title: Swift::String
+  public var label: Swift::String
+  public var order: Swift::Int
+  public var metadata: [Swift::String : Swift::String]
+  @inlinable public init(id: Swift::String, screenID: Swift::String, domainID: Swift::String, title: Swift::String, label: Swift::String = "", order: Swift::Int = 0, metadata: [Swift::String : Swift::String] = [:]) {
+		self.id = id
+		self.screenID = screenID
+		self.domainID = domainID
+		self.title = title
+		self.label = label
+		self.order = order
+		self.metadata = metadata
+	}
+  @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisModel::PyxisState, _ b: PyxisModel::PyxisState) -> Swift::Bool
+  public func encode(to encoder: any Swift::Encoder) throws
+  public init(from decoder: any Swift::Decoder) throws
+}
+public struct PyxisTransition : Swift::Codable, Swift::Equatable, Swift::Sendable {
+  public var id: Swift::String
+  public var observationID: Swift::String
+  public var fromStateID: Swift::String
+  public var toStateID: Swift::String
+  public var action: Swift::String
+  public var kind: Swift::String
+  public var sequence: Swift::Int
+  public var status: PyxisModel::PyxisTransitionStatus
+  @_hasInitialValue public var failure: Swift::String?
+  @inlinable public init(id: Swift::String, observationID: Swift::String, fromStateID: Swift::String, toStateID: Swift::String, action: Swift::String, kind: Swift::String, sequence: Swift::Int, status: PyxisModel::PyxisTransitionStatus, failure: Swift::String? = nil) {
+		self.id = id
+		self.observationID = observationID
+		self.fromStateID = fromStateID
+		self.toStateID = toStateID
+		self.action = action
+		self.kind = kind
+		self.sequence = sequence
+		self.status = status
+		self.failure = failure
+	}
+  public init(from decoder: any Swift::Decoder) throws
+  @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisModel::PyxisTransition, _ b: PyxisModel::PyxisTransition) -> Swift::Bool
+  public func encode(to encoder: any Swift::Encoder) throws
+}
+public enum PyxisTransitionStatus : Swift::String, Swift::Codable, Swift::Sendable {
+  case succeeded
+  case failed
+  @inlinable public init?(rawValue: Swift::String)
+  public typealias RawValue = Swift::String
+  public var rawValue: Swift::String {
+    @inlinable get
+  }
+}
+public enum PyxisValidation {
+  @_hasInitialValue public static let maximumInteger: Swift::Int
+  public static func validate(_ document: PyxisModel::PyxisMapDocument, requireAssetHashes: Swift::Bool? = nil) throws
+  public static func validateAsset(_ asset: PyxisModel::PyxisAsset, requireHash: Swift::Bool) throws
+  public static func validatePath(_ path: Swift::String) throws
+}
+public struct PyxisValidationError : Swift::Error, Swift::CustomStringConvertible, Swift::Sendable {
+  public let description: Swift::String
+  @inlinable public init(_ description: Swift::String) {
+		self.description = description
+	}
+}
+extension PyxisModel::PyxisVariantEntry {
+  public struct Accessibility : Swift::Equatable, Swift::Hashable, Swift::Sendable {
+    public let key: Swift::String
+    public let value: Swift::String
+    @inlinable public init(key: Swift::String, value: Swift::String) {
+			self.key = key
+			self.value = value
+		}
+    @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisModel::PyxisVariantEntry.PyxisModel::Accessibility, _ b: PyxisModel::PyxisVariantEntry.PyxisModel::Accessibility) -> Swift::Bool
+    public func hash(into hasher: inout Swift::Hasher)
+    public var hashValue: Swift::Int {
+      get
+    }
+  }
+  public static var accessibilityKey: Swift::String {
+    get
+  }
+  @inlinable public static func accessibility(_ value: PyxisModel::PyxisVariantEntry.PyxisModel::Accessibility) -> PyxisModel::PyxisVariantEntry {
+		.init(key: accessibilityKey + "." + value.key, value: value.value)
+	}
+}
+extension PyxisModel::PyxisVariantEntry {
+  public enum ColorScheme : Swift::String, Swift::Codable, Swift::CaseIterable, Swift::Sendable {
+    case light, dark, system
+    @inlinable public init?(rawValue: Swift::String)
+    public typealias AllCases = [PyxisModel::PyxisVariantEntry.PyxisModel::ColorScheme]
+    public typealias RawValue = Swift::String
+    nonisolated public static var allCases: [PyxisModel::PyxisVariantEntry.PyxisModel::ColorScheme] {
+      get
+    }
+    public var rawValue: Swift::String {
+      @inlinable get
+    }
+  }
+  public static var colorSchemeKey: Swift::String {
+    get
+  }
+  @inlinable public static func colorScheme(_ value: PyxisModel::PyxisVariantEntry.PyxisModel::ColorScheme) -> PyxisModel::PyxisVariantEntry {
+		.init(key: colorSchemeKey, value: value.rawValue)
+	}
+}
+extension PyxisModel::PyxisVariantEntry.PyxisModel::Accessibility {
+  public enum ContentSize : Swift::String, Swift::Codable, Swift::CaseIterable, Swift::Sendable {
+    case xSmall
+    case small, medium, large
+    case xLarge
+    case xxLarge
+    case xxxLarge
+    case accessibilityMedium
+    case accessibilityLarge
+    case accessibilityXLarge
+    case accessibilityXXLarge
+    case accessibilityXXXLarge
+    @inlinable public init?(rawValue: Swift::String)
+    public typealias AllCases = [PyxisModel::PyxisVariantEntry.PyxisModel::Accessibility.PyxisModel::ContentSize]
+    public typealias RawValue = Swift::String
+    nonisolated public static var allCases: [PyxisModel::PyxisVariantEntry.PyxisModel::Accessibility.PyxisModel::ContentSize] {
+      get
+    }
+    public var rawValue: Swift::String {
+      @inlinable get
+    }
+  }
+  public static var contentSizeKey: Swift::String {
+    get
+  }
+  @inlinable public static func contentSize(_ value: PyxisModel::PyxisVariantEntry.PyxisModel::Accessibility.PyxisModel::ContentSize) -> PyxisModel::PyxisVariantEntry.PyxisModel::Accessibility {
+		.init(key: contentSizeKey, value: value.rawValue)
+	}
+}
+extension PyxisModel::PyxisVariantEntry {
+  public static var accessibilityContentSizeKey: Swift::String {
+    get
+  }
+}
+extension PyxisModel::PyxisVariantEntry.PyxisModel::Accessibility {
+  public enum Contrast : Swift::String, Swift::Codable, Swift::CaseIterable, Swift::Sendable {
+    case normal, high
+    @inlinable public init?(rawValue: Swift::String)
+    public typealias AllCases = [PyxisModel::PyxisVariantEntry.PyxisModel::Accessibility.PyxisModel::Contrast]
+    public typealias RawValue = Swift::String
+    nonisolated public static var allCases: [PyxisModel::PyxisVariantEntry.PyxisModel::Accessibility.PyxisModel::Contrast] {
+      get
+    }
+    public var rawValue: Swift::String {
+      @inlinable get
+    }
+  }
+  public static var contrastKey: Swift::String {
+    get
+  }
+  @inlinable public static func contrast(_ value: PyxisModel::PyxisVariantEntry.PyxisModel::Accessibility.PyxisModel::Contrast) -> PyxisModel::PyxisVariantEntry.PyxisModel::Accessibility {
+		.init(key: contrastKey, value: value.rawValue)
+	}
+}
+extension PyxisModel::PyxisVariantEntry {
+  public static var accessibilityContrastKey: Swift::String {
+    get
+  }
+}
+extension PyxisModel::PyxisVariantEntry {
+  public static var deviceKey: Swift::String {
+    get
+  }
+  @inlinable public static func device(_ value: Swift::String) -> PyxisModel::PyxisVariantEntry {
+		.init(key: deviceKey, value: value)
+	}
+}
+extension PyxisModel::PyxisVariantEntry {
+  public enum LayoutDirection : Swift::String, Swift::Codable, Swift::CaseIterable, Swift::Sendable {
+    case ltr, rtl
+    @inlinable public init?(rawValue: Swift::String)
+    public typealias AllCases = [PyxisModel::PyxisVariantEntry.PyxisModel::LayoutDirection]
+    public typealias RawValue = Swift::String
+    nonisolated public static var allCases: [PyxisModel::PyxisVariantEntry.PyxisModel::LayoutDirection] {
+      get
+    }
+    public var rawValue: Swift::String {
+      @inlinable get
+    }
+  }
+  public static var layoutDirectionKey: Swift::String {
+    get
+  }
+  @inlinable public static func layoutDirection(_ value: PyxisModel::PyxisVariantEntry.PyxisModel::LayoutDirection) -> PyxisModel::PyxisVariantEntry {
+		.init(key: layoutDirectionKey, value: value.rawValue)
+	}
+}
+extension PyxisModel::PyxisVariantEntry {
+  public static var localeKey: Swift::String {
+    get
+  }
+  @inlinable public static func locale(_ value: Swift::String) -> PyxisModel::PyxisVariantEntry {
+		.init(key: localeKey, value: value)
+	}
+}
+extension PyxisModel::PyxisVariantEntry {
+  public static var timeZoneKey: Swift::String {
+    get
+  }
+  @inlinable public static func timeZone(_ value: Swift::String) -> PyxisModel::PyxisVariantEntry {
+		.init(key: timeZoneKey, value: value)
+	}
+}
+public struct PyxisVariantEntry : Swift::Equatable, Swift::Hashable, Swift::Sendable {
+  public let key: Swift::String
+  public let value: Swift::String
+  @inlinable public init(key: Swift::String, value: Swift::String) {
+		self.key = key
+		self.value = value
+	}
+  @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisModel::PyxisVariantEntry, _ b: PyxisModel::PyxisVariantEntry) -> Swift::Bool
+  public func hash(into hasher: inout Swift::Hasher)
+  public var hashValue: Swift::Int {
+    get
+  }
+}
+public struct PyxisVariantResult : Swift::Codable, Swift::Equatable, Swift::Sendable {
+  public var status: PyxisModel::PyxisVariantStatus
+  @_hasInitialValue public var value: Swift::String?
+  @_hasInitialValue public var reason: Swift::String?
+  @inlinable public init(status: PyxisModel::PyxisVariantStatus, value: Swift::String? = nil, reason: Swift::String? = nil) {
+		self.status = status
+		self.value = value
+		self.reason = reason
+	}
+  public init(from decoder: any Swift::Decoder) throws
+  @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisModel::PyxisVariantResult, _ b: PyxisModel::PyxisVariantResult) -> Swift::Bool
+  public func encode(to encoder: any Swift::Encoder) throws
+}
+public enum PyxisVariantStatus : Swift::String, Swift::Codable, Swift::Sendable {
+  case applied
+  case observed
+  case unsupported
+  case unverified
+  @inlinable public init?(rawValue: Swift::String)
+  public typealias RawValue = Swift::String
+  public var rawValue: Swift::String {
+    @inlinable get
+  }
+}
+public struct PyxisVariants : Swift::Codable, Swift::Equatable, Swift::Sendable, Swift::ExpressibleByArrayLiteral, Swift::ExpressibleByDictionaryLiteral, Swift::Sequence {
+  public static func == (lhs: PyxisModel::PyxisVariants, rhs: PyxisModel::PyxisVariants) -> Swift::Bool
+  private var storage: OrderedCollections::OrderedDictionary<Swift::String, Swift::String>
+  public init(_ dictionary: [Swift::String : Swift::String] = [:])
+  public init(_ entries: some Sequence<PyxisVariantEntry>)
+  public init(arrayLiteral elements: PyxisModel::PyxisVariantEntry...)
+  public init(dictionaryLiteral elements: (Swift::String, Swift::String)...)
+  public init(from decoder: any Swift::Decoder) throws
+  public var dictionary: [Swift::String : Swift::String] {
+    get
+  }
+  public var keys: OrderedCollections::OrderedSet<Swift::String> {
+    get
+  }
+  public var isEmpty: Swift::Bool {
+    get
+  }
+  public var count: Swift::Int {
+    get
+  }
+  public subscript(key: Swift::String) -> Swift::String? {
+    get
+    set
+  }
+  public func encode(to encoder: any Swift::Encoder) throws
+  public func makeIterator() -> OrderedCollections::OrderedDictionary<Swift::String, Swift::String>.OrderedCollections::Iterator
+  public mutating func set(_ entry: PyxisModel::PyxisVariantEntry)
+  public func merging(_ other: PyxisModel::PyxisVariants) -> PyxisModel::PyxisVariants
+  public func filter(_ isIncluded: (OrderedCollections::OrderedDictionary<Swift::String, Swift::String>.OrderedCollections::Element) throws -> Swift::Bool) rethrows -> PyxisModel::PyxisVariants
+  public func mapValues<Value>(_ transform: (Swift::String) throws -> Value) rethrows -> [Swift::String : Value]
+  public typealias ArrayLiteralElement = PyxisModel::PyxisVariantEntry
+  public typealias Element = OrderedCollections::OrderedDictionary<Swift::String, Swift::String>.OrderedCollections::Element
+  public typealias Iterator = OrderedCollections::OrderedDictionary<Swift::String, Swift::String>.OrderedCollections::Iterator
+  public typealias Key = Swift::String
+  public typealias Value = Swift::String
+}
+extension PyxisModel::PyxisArtifactType : Swift::Equatable {}
+extension PyxisModel::PyxisArtifactType : Swift::Hashable {}
+extension PyxisModel::PyxisArtifactType : Swift::RawRepresentable {}
+extension PyxisModel::PyxisDocumentFormat : Swift::Equatable {}
+extension PyxisModel::PyxisDocumentFormat : Swift::Hashable {}
+extension PyxisModel::PyxisDocumentFormat : Swift::RawRepresentable {}
+extension PyxisModel::PyxisMediaType : Swift::Equatable {}
+extension PyxisModel::PyxisMediaType : Swift::Hashable {}
+extension PyxisModel::PyxisMediaType : Swift::RawRepresentable {}
+extension PyxisModel::PyxisObservationStatus : Swift::Equatable {}
+extension PyxisModel::PyxisObservationStatus : Swift::Hashable {}
+extension PyxisModel::PyxisObservationStatus : Swift::RawRepresentable {}
+extension PyxisModel::PyxisTransitionStatus : Swift::Equatable {}
+extension PyxisModel::PyxisTransitionStatus : Swift::Hashable {}
+extension PyxisModel::PyxisTransitionStatus : Swift::RawRepresentable {}
+extension PyxisModel::PyxisVariantEntry.PyxisModel::ColorScheme : Swift::Equatable {}
+extension PyxisModel::PyxisVariantEntry.PyxisModel::ColorScheme : Swift::Hashable {}
+extension PyxisModel::PyxisVariantEntry.PyxisModel::ColorScheme : Swift::RawRepresentable {}
+extension PyxisModel::PyxisVariantEntry.PyxisModel::Accessibility.PyxisModel::ContentSize : Swift::Equatable {}
+extension PyxisModel::PyxisVariantEntry.PyxisModel::Accessibility.PyxisModel::ContentSize : Swift::Hashable {}
+extension PyxisModel::PyxisVariantEntry.PyxisModel::Accessibility.PyxisModel::ContentSize : Swift::RawRepresentable {}
+extension PyxisModel::PyxisVariantEntry.PyxisModel::Accessibility.PyxisModel::Contrast : Swift::Equatable {}
+extension PyxisModel::PyxisVariantEntry.PyxisModel::Accessibility.PyxisModel::Contrast : Swift::Hashable {}
+extension PyxisModel::PyxisVariantEntry.PyxisModel::Accessibility.PyxisModel::Contrast : Swift::RawRepresentable {}
+extension PyxisModel::PyxisVariantEntry.PyxisModel::LayoutDirection : Swift::Equatable {}
+extension PyxisModel::PyxisVariantEntry.PyxisModel::LayoutDirection : Swift::Hashable {}
+extension PyxisModel::PyxisVariantEntry.PyxisModel::LayoutDirection : Swift::RawRepresentable {}
+extension PyxisModel::PyxisVariantStatus : Swift::Equatable {}
+extension PyxisModel::PyxisVariantStatus : Swift::Hashable {}
+extension PyxisModel::PyxisVariantStatus : Swift::RawRepresentable {}

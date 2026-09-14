@@ -1,0 +1,649 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1896D221924229F62DD7CD7D /* PyxisVariantEntry+Example.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B05DE64ECC9A50D1532853 /* PyxisVariantEntry+Example.swift */; };
+		27313A3AEEB8B3745C028AF7 /* AsyncDemoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E19FF2B7C8EC70C5475A144 /* AsyncDemoUITests.swift */; };
+		2AD0B2B67B4BB6D5286D2B1F /* DemoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EBFF4F32A4809192DC04F2D /* DemoUITests.swift */; };
+		36830E108B60300379FC59DB /* WindowApplicationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13B4185407274C2A25CA5145 /* WindowApplicationTests.swift */; };
+		39C34F818851A29A9202AA80 /* BootstrapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEE2ACBC7EF1752682B7EA8D /* BootstrapTests.swift */; };
+		3F8473498F428244C5B218AB /* ExampleElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = B73BEC2CF7E266F8BDB6780A /* ExampleElement.swift */; };
+		481B4361563DB48EDECD06C5 /* PyxisRecordingConfiguration+Example.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8077F9730B297AD2131449F8 /* PyxisRecordingConfiguration+Example.swift */; };
+		4C46A9F533490AC6988E55D8 /* PyxisRecorder+Example.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631287324E940E14AB7203D4 /* PyxisRecorder+Example.swift */; };
+		55A423C44FC2AD1BC86C2281 /* ExampleTestEnvironmentKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4FD58DC49C56FFBD4F26E1 /* ExampleTestEnvironmentKey.swift */; };
+		61A540E270E88F5C3A84F6AD /* ExampleProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02C3EA77E4AFBF4668501310 /* ExampleProfile.swift */; };
+		65B13B82772C272BDEFC8216 /* PyxisState+Example.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9540963DED5CC1029607768E /* PyxisState+Example.swift */; };
+		6D455F3914A2FEB00887AA4D /* PyxisDomain+Example.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A279762DD89E3577A014A73 /* PyxisDomain+Example.swift */; };
+		6FB8A12CF89BEF54A6373655 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F63AD859CC24D5595B62F48 /* AppDelegate.swift */; };
+		7449F54D74C1E2F6EFB40756 /* MatrixUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 943A224D12271A0E09AEC557 /* MatrixUITests.swift */; };
+		7B4E67B190D2D20D5A2BB7E4 /* ExampleTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 5EBC2C97B305A09FC0033230 /* ExampleTesting */; };
+		8D8D11EBAB1F8CCE1914D9A4 /* ExampleDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 882108E0A48AA7D915F964C9 /* ExampleDevice.swift */; };
+		9C913295FF5734AB92EC587F /* ConfigurationScopeBarrier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ABAD652010414D2FB4B8933 /* ConfigurationScopeBarrier.swift */; };
+		A13213B15893680F6DA8F951 /* UIKitWindowApplicationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A56354350501CE4E8606ABB8 /* UIKitWindowApplicationTests.swift */; };
+		A4B40C727B27DF7E43793FDB /* ConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 620922A348074CDCE2759A7A /* ConfigurationTests.swift */; };
+		A51FDD3F09E3035CFBBBAF6C /* PreparationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54CCA43D8F60DE9566E682A3 /* PreparationTests.swift */; };
+		A88E61F3656049D4B1FCA502 /* ExampleInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE20710B18A448E90400992 /* ExampleInput.swift */; };
+		A9886C3D85788E8ECDA66380 /* RecordingEnvironmentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06FB75BBB705D800F68CD9A8 /* RecordingEnvironmentTests.swift */; };
+		B1A8857A452E56AAC36E2716 /* ExampleJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02CD67CF637B88933B32D0BC /* ExampleJourney.swift */; };
+		B276467EDF0174D5C205A5BD /* XCUIElementQuery+Example.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E76605821030C77698848CE /* XCUIElementQuery+Example.swift */; };
+		BD3FB2DD6BFD2C356CBEBD70 /* ExampleScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFC9C9C3FE586379291916A0 /* ExampleScreen.swift */; };
+		DBB4D5E727D8F79E788D8504 /* ExampleApp in Frameworks */ = {isa = PBXBuildFile; productRef = BD2EDD7F10E7B0BBEF0C7A41 /* ExampleApp */; };
+		E1A1ED1F197C6AD0D9F5ACFC /* ExampleProfile+Recording.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A9775F8B5B4B9417E3FD31 /* ExampleProfile+Recording.swift */; };
+		ECF1B515FCD3C94C761AC022 /* ExampleNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4ADBA29A31C65FC16B3A3CA /* ExampleNavigation.swift */; };
+		F086A067AEDF71DE737A9734 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40D007FB991A5CB36F204C01 /* SceneDelegate.swift */; };
+		F0E57BE9D218B703C077382E /* ExampleSubscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71101B26E1C8579A7F95039 /* ExampleSubscription.swift */; };
+		FF9B8D0B279934FDA3FAAE72 /* ExampleProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E140234449F039644F24189 /* ExampleProfileTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		0379060D6A45AD35546CA9BA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 07553C37D887360EC701DD81 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C4EE7CECDCFBD845861E8459;
+			remoteInfo = PyxisExample;
+		};
+		5756515310ABCF11D2442063 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 07553C37D887360EC701DD81 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C4EE7CECDCFBD845861E8459;
+			remoteInfo = PyxisExample;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		02C3EA77E4AFBF4668501310 /* ExampleProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleProfile.swift; sourceTree = "<group>"; };
+		02CD67CF637B88933B32D0BC /* ExampleJourney.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleJourney.swift; sourceTree = "<group>"; };
+		06FB75BBB705D800F68CD9A8 /* RecordingEnvironmentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingEnvironmentTests.swift; sourceTree = "<group>"; };
+		0E76605821030C77698848CE /* XCUIElementQuery+Example.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCUIElementQuery+Example.swift"; sourceTree = "<group>"; };
+		13B4185407274C2A25CA5145 /* WindowApplicationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowApplicationTests.swift; sourceTree = "<group>"; };
+		14129F58CF434FD9465ABE83 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		15B22DDAB30434FC621699A6 /* PyxisExample.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PyxisExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1E19FF2B7C8EC70C5475A144 /* AsyncDemoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncDemoUITests.swift; sourceTree = "<group>"; };
+		1F63AD859CC24D5595B62F48 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		3A279762DD89E3577A014A73 /* PyxisDomain+Example.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PyxisDomain+Example.swift"; sourceTree = "<group>"; };
+		3ABAD652010414D2FB4B8933 /* ConfigurationScopeBarrier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationScopeBarrier.swift; sourceTree = "<group>"; };
+		40D007FB991A5CB36F204C01 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		54CCA43D8F60DE9566E682A3 /* PreparationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreparationTests.swift; sourceTree = "<group>"; };
+		5AE20710B18A448E90400992 /* ExampleInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleInput.swift; sourceTree = "<group>"; };
+		5B4FD58DC49C56FFBD4F26E1 /* ExampleTestEnvironmentKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleTestEnvironmentKey.swift; sourceTree = "<group>"; };
+		620922A348074CDCE2759A7A /* ConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationTests.swift; sourceTree = "<group>"; };
+		631287324E940E14AB7203D4 /* PyxisRecorder+Example.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PyxisRecorder+Example.swift"; sourceTree = "<group>"; };
+		7E140234449F039644F24189 /* ExampleProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleProfileTests.swift; sourceTree = "<group>"; };
+		7EBFF4F32A4809192DC04F2D /* DemoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoUITests.swift; sourceTree = "<group>"; };
+		8077F9730B297AD2131449F8 /* PyxisRecordingConfiguration+Example.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PyxisRecordingConfiguration+Example.swift"; sourceTree = "<group>"; };
+		882108E0A48AA7D915F964C9 /* ExampleDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleDevice.swift; sourceTree = "<group>"; };
+		8A8DFBD6B28902F551B0AFDF /* PyxisRuntimeTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PyxisRuntimeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		943A224D12271A0E09AEC557 /* MatrixUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixUITests.swift; sourceTree = "<group>"; };
+		9540963DED5CC1029607768E /* PyxisState+Example.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PyxisState+Example.swift"; sourceTree = "<group>"; };
+		A56354350501CE4E8606ABB8 /* UIKitWindowApplicationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIKitWindowApplicationTests.swift; sourceTree = "<group>"; };
+		A71101B26E1C8579A7F95039 /* ExampleSubscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleSubscription.swift; sourceTree = "<group>"; };
+		AFC9C9C3FE586379291916A0 /* ExampleScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleScreen.swift; sourceTree = "<group>"; };
+		B1B05DE64ECC9A50D1532853 /* PyxisVariantEntry+Example.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PyxisVariantEntry+Example.swift"; sourceTree = "<group>"; };
+		B73BEC2CF7E266F8BDB6780A /* ExampleElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleElement.swift; sourceTree = "<group>"; };
+		BEE2ACBC7EF1752682B7EA8D /* BootstrapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BootstrapTests.swift; sourceTree = "<group>"; };
+		D4ADBA29A31C65FC16B3A3CA /* ExampleNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleNavigation.swift; sourceTree = "<group>"; };
+		E1A9775F8B5B4B9417E3FD31 /* ExampleProfile+Recording.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExampleProfile+Recording.swift"; sourceTree = "<group>"; };
+		F427964A056E56CA793B24A1 /* PyxisExampleUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PyxisExampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1F19776B139975B376021E2C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7B4E67B190D2D20D5A2BB7E4 /* ExampleTesting in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2556D2EA0C12B741B312DEB6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DBB4D5E727D8F79E788D8504 /* ExampleApp in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3CB6B584F5D84A8BE331E8FE /* PyxisRuntimeTests */ = {
+			isa = PBXGroup;
+			children = (
+				BEE2ACBC7EF1752682B7EA8D /* BootstrapTests.swift */,
+				3ABAD652010414D2FB4B8933 /* ConfigurationScopeBarrier.swift */,
+				620922A348074CDCE2759A7A /* ConfigurationTests.swift */,
+				54CCA43D8F60DE9566E682A3 /* PreparationTests.swift */,
+				06FB75BBB705D800F68CD9A8 /* RecordingEnvironmentTests.swift */,
+				A56354350501CE4E8606ABB8 /* UIKitWindowApplicationTests.swift */,
+				13B4185407274C2A25CA5145 /* WindowApplicationTests.swift */,
+			);
+			name = PyxisRuntimeTests;
+			path = ../Tests/PyxisRuntimeTests;
+			sourceTree = "<group>";
+		};
+		4F6D953A99133233DE0A244B = {
+			isa = PBXGroup;
+			children = (
+				CFA3B21D3D81BBF1FE051100 /* App */,
+				3CB6B584F5D84A8BE331E8FE /* PyxisRuntimeTests */,
+				B81018857A78249FAFFFA089 /* UITests */,
+				E48D5D8D430E4299E3FC3ADD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6994A2B1A246BD112458DCC9 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				882108E0A48AA7D915F964C9 /* ExampleDevice.swift */,
+				B73BEC2CF7E266F8BDB6780A /* ExampleElement.swift */,
+				5AE20710B18A448E90400992 /* ExampleInput.swift */,
+				02CD67CF637B88933B32D0BC /* ExampleJourney.swift */,
+				D4ADBA29A31C65FC16B3A3CA /* ExampleNavigation.swift */,
+				02C3EA77E4AFBF4668501310 /* ExampleProfile.swift */,
+				E1A9775F8B5B4B9417E3FD31 /* ExampleProfile+Recording.swift */,
+				AFC9C9C3FE586379291916A0 /* ExampleScreen.swift */,
+				A71101B26E1C8579A7F95039 /* ExampleSubscription.swift */,
+				5B4FD58DC49C56FFBD4F26E1 /* ExampleTestEnvironmentKey.swift */,
+				3A279762DD89E3577A014A73 /* PyxisDomain+Example.swift */,
+				631287324E940E14AB7203D4 /* PyxisRecorder+Example.swift */,
+				8077F9730B297AD2131449F8 /* PyxisRecordingConfiguration+Example.swift */,
+				9540963DED5CC1029607768E /* PyxisState+Example.swift */,
+				B1B05DE64ECC9A50D1532853 /* PyxisVariantEntry+Example.swift */,
+				0E76605821030C77698848CE /* XCUIElementQuery+Example.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		B81018857A78249FAFFFA089 /* UITests */ = {
+			isa = PBXGroup;
+			children = (
+				1E19FF2B7C8EC70C5475A144 /* AsyncDemoUITests.swift */,
+				7EBFF4F32A4809192DC04F2D /* DemoUITests.swift */,
+				7E140234449F039644F24189 /* ExampleProfileTests.swift */,
+				943A224D12271A0E09AEC557 /* MatrixUITests.swift */,
+				6994A2B1A246BD112458DCC9 /* Support */,
+			);
+			path = UITests;
+			sourceTree = "<group>";
+		};
+		CFA3B21D3D81BBF1FE051100 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				1F63AD859CC24D5595B62F48 /* AppDelegate.swift */,
+				14129F58CF434FD9465ABE83 /* Info.plist */,
+				40D007FB991A5CB36F204C01 /* SceneDelegate.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		E48D5D8D430E4299E3FC3ADD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				15B22DDAB30434FC621699A6 /* PyxisExample.app */,
+				F427964A056E56CA793B24A1 /* PyxisExampleUITests.xctest */,
+				8A8DFBD6B28902F551B0AFDF /* PyxisRuntimeTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		17DE232D72AB7B5E9723F618 /* PyxisRuntimeTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2FD2F5D489781DB1928F09B0 /* Build configuration list for PBXNativeTarget "PyxisRuntimeTests" */;
+			buildPhases = (
+				894D2A66BD7EC9BF70880CE1 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D5A33871954DF53EF62A0EB1 /* PBXTargetDependency */,
+			);
+			name = PyxisRuntimeTests;
+			packageProductDependencies = (
+			);
+			productName = PyxisRuntimeTests;
+			productReference = 8A8DFBD6B28902F551B0AFDF /* PyxisRuntimeTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		94AF2B098B0463ABD5A4F4AD /* PyxisExampleUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F80DC5F6521D69B66919AA75 /* Build configuration list for PBXNativeTarget "PyxisExampleUITests" */;
+			buildPhases = (
+				2A8FE7FC5D8A5D1F8FA5F091 /* Sources */,
+				1F19776B139975B376021E2C /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				30EAB6A88859932B79770613 /* PBXTargetDependency */,
+			);
+			name = PyxisExampleUITests;
+			packageProductDependencies = (
+				5EBC2C97B305A09FC0033230 /* ExampleTesting */,
+			);
+			productName = PyxisExampleUITests;
+			productReference = F427964A056E56CA793B24A1 /* PyxisExampleUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		C4EE7CECDCFBD845861E8459 /* PyxisExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 93BB4370448B460C052F65A9 /* Build configuration list for PBXNativeTarget "PyxisExample" */;
+			buildPhases = (
+				1F073C477506FE61C1D922F8 /* Sources */,
+				2556D2EA0C12B741B312DEB6 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PyxisExample;
+			packageProductDependencies = (
+				BD2EDD7F10E7B0BBEF0C7A41 /* ExampleApp */,
+			);
+			productName = PyxisExample;
+			productReference = 15B22DDAB30434FC621699A6 /* PyxisExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		07553C37D887360EC701DD81 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					17DE232D72AB7B5E9723F618 = {
+						DevelopmentTeam = "";
+					};
+					94AF2B098B0463ABD5A4F4AD = {
+						DevelopmentTeam = "";
+						TestTargetID = C4EE7CECDCFBD845861E8459;
+					};
+					C4EE7CECDCFBD845861E8459 = {
+						DevelopmentTeam = "";
+					};
+				};
+			};
+			buildConfigurationList = 9BC34FCFA6534A42D1E84832 /* Build configuration list for PBXProject "PyxisExample" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 4F6D953A99133233DE0A244B;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C4EE7CECDCFBD845861E8459 /* PyxisExample */,
+				94AF2B098B0463ABD5A4F4AD /* PyxisExampleUITests */,
+				17DE232D72AB7B5E9723F618 /* PyxisRuntimeTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1F073C477506FE61C1D922F8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6FB8A12CF89BEF54A6373655 /* AppDelegate.swift in Sources */,
+				F086A067AEDF71DE737A9734 /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2A8FE7FC5D8A5D1F8FA5F091 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				27313A3AEEB8B3745C028AF7 /* AsyncDemoUITests.swift in Sources */,
+				2AD0B2B67B4BB6D5286D2B1F /* DemoUITests.swift in Sources */,
+				8D8D11EBAB1F8CCE1914D9A4 /* ExampleDevice.swift in Sources */,
+				3F8473498F428244C5B218AB /* ExampleElement.swift in Sources */,
+				A88E61F3656049D4B1FCA502 /* ExampleInput.swift in Sources */,
+				B1A8857A452E56AAC36E2716 /* ExampleJourney.swift in Sources */,
+				ECF1B515FCD3C94C761AC022 /* ExampleNavigation.swift in Sources */,
+				E1A1ED1F197C6AD0D9F5ACFC /* ExampleProfile+Recording.swift in Sources */,
+				61A540E270E88F5C3A84F6AD /* ExampleProfile.swift in Sources */,
+				FF9B8D0B279934FDA3FAAE72 /* ExampleProfileTests.swift in Sources */,
+				BD3FB2DD6BFD2C356CBEBD70 /* ExampleScreen.swift in Sources */,
+				F0E57BE9D218B703C077382E /* ExampleSubscription.swift in Sources */,
+				55A423C44FC2AD1BC86C2281 /* ExampleTestEnvironmentKey.swift in Sources */,
+				7449F54D74C1E2F6EFB40756 /* MatrixUITests.swift in Sources */,
+				6D455F3914A2FEB00887AA4D /* PyxisDomain+Example.swift in Sources */,
+				4C46A9F533490AC6988E55D8 /* PyxisRecorder+Example.swift in Sources */,
+				481B4361563DB48EDECD06C5 /* PyxisRecordingConfiguration+Example.swift in Sources */,
+				65B13B82772C272BDEFC8216 /* PyxisState+Example.swift in Sources */,
+				1896D221924229F62DD7CD7D /* PyxisVariantEntry+Example.swift in Sources */,
+				B276467EDF0174D5C205A5BD /* XCUIElementQuery+Example.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		894D2A66BD7EC9BF70880CE1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				39C34F818851A29A9202AA80 /* BootstrapTests.swift in Sources */,
+				9C913295FF5734AB92EC587F /* ConfigurationScopeBarrier.swift in Sources */,
+				A4B40C727B27DF7E43793FDB /* ConfigurationTests.swift in Sources */,
+				A51FDD3F09E3035CFBBBAF6C /* PreparationTests.swift in Sources */,
+				A9886C3D85788E8ECDA66380 /* RecordingEnvironmentTests.swift in Sources */,
+				A13213B15893680F6DA8F951 /* UIKitWindowApplicationTests.swift in Sources */,
+				36830E108B60300379FC59DB /* WindowApplicationTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		30EAB6A88859932B79770613 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C4EE7CECDCFBD845861E8459 /* PyxisExample */;
+			targetProxy = 5756515310ABCF11D2442063 /* PBXContainerItemProxy */;
+		};
+		D5A33871954DF53EF62A0EB1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C4EE7CECDCFBD845861E8459 /* PyxisExample */;
+			targetProxy = 0379060D6A45AD35546CA9BA /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		175E08EB87AEDA2986105653 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.pyxis.example.PyxisExampleUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = PyxisExample;
+			};
+			name = Debug;
+		};
+		2473DD4F6FEB727D6E0E0E8E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.pyxis.example.PyxisExampleUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = PyxisExample;
+			};
+			name = Release;
+		};
+		2F23934C62C45B10B957FC1F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		37EBA56A7CDA8F5391A9A97E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.pyxis.example.PyxisExample;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		6BAABC6D8E38F82D2B453B34 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		74DF1A13CCF5E9A83EEF629C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.pyxis.example.PyxisExample;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C012B9CBED56F23B61EEABFD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -package-name pyxis_swift";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.pyxis.example.PyxisRuntimeTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PyxisExample.app/PyxisExample";
+			};
+			name = Release;
+		};
+		CF9C838F56D88CDD50BCA8B8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -package-name pyxis_swift";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.pyxis.example.PyxisRuntimeTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PyxisExample.app/PyxisExample";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2FD2F5D489781DB1928F09B0 /* Build configuration list for PBXNativeTarget "PyxisRuntimeTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CF9C838F56D88CDD50BCA8B8 /* Debug */,
+				C012B9CBED56F23B61EEABFD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		93BB4370448B460C052F65A9 /* Build configuration list for PBXNativeTarget "PyxisExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				74DF1A13CCF5E9A83EEF629C /* Debug */,
+				37EBA56A7CDA8F5391A9A97E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9BC34FCFA6534A42D1E84832 /* Build configuration list for PBXProject "PyxisExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2F23934C62C45B10B957FC1F /* Debug */,
+				6BAABC6D8E38F82D2B453B34 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F80DC5F6521D69B66919AA75 /* Build configuration list for PBXNativeTarget "PyxisExampleUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				175E08EB87AEDA2986105653 /* Debug */,
+				2473DD4F6FEB727D6E0E0E8E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5EBC2C97B305A09FC0033230 /* ExampleTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ExampleTesting;
+		};
+		BD2EDD7F10E7B0BBEF0C7A41 /* ExampleApp */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ExampleApp;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 07553C37D887360EC701DD81 /* Project object */;
+}

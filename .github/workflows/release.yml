@@ -1,0 +1,138 @@
+name: Release
+run-name: Release (${{ inputs.bump }}) from ${{ github.ref_name }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version bump
+        required: true
+        default: patch
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pyxis-swift-release
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  prepare:
+    name: Test and record example
+    runs-on: macos-26
+    timeout-minutes: 120
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Test release scripts
+        run: python3 -m unittest discover -s scripts/tests -p 'test_release*.py'
+
+      - name: Calculate release version
+        id: version
+        env:
+          BUMP: ${{ inputs.bump }}
+        run: |
+          python3 scripts/release_version.py --bump "$BUMP" --github-output "$GITHUB_OUTPUT"
+
+      - name: Install recording tools
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: '1'
+        run: |
+          for tool in ffmpeg xcodegen; do
+            command -v "$tool" >/dev/null || brew install "$tool"
+          done
+          xcodebuild -version
+          swift --version
+
+      - name: Test package and build CLI
+        run: |
+          swift test
+          swift build --configuration release --product pyxis
+
+      - name: Prepare example recording
+        run: |
+          make -C Example project
+          mkdir -p .generated/release
+          ruby scripts/release_recording_config.rb > .generated/release/recording.json
+          .build/release/pyxis record --config .generated/release/recording.json --list
+
+      - name: Record example
+        run: .build/release/pyxis record --config .generated/release/recording.json
+
+      - name: Validate and stage release attachment
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil
+          recordings = list(Path('.generated/release/recordings').glob('*/recording.pyx'))
+          if len(recordings) != 1:
+              raise SystemExit(f'Expected one recording.pyx, found {len(recordings)}')
+          shutil.copyfile(recordings[0], '.generated/release/pyxis-example.pyx')
+          PY
+          .build/release/pyxis validate .generated/release/pyxis-example.pyx
+
+      - name: Store validated release attachment
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-example
+          path: .generated/release/pyxis-example.pyx
+          include-hidden-files: true
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+
+      - name: Store recording diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-recording-diagnostics
+          path: |
+            .generated/release/recording.json
+            .generated/release/recordings
+          include-hidden-files: true
+          retention-days: 7
+
+  publish:
+    name: Tag and publish release
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
+      RELEASE_SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-example
+          path: .generated/release
+
+      - name: Publish tag and release attachment
+        run: bash scripts/publish_release.sh .generated/release/pyxis-example.pyx
+
+      - name: Summarize release
+        run: |
+          echo "Released [$RELEASE_TAG]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/$RELEASE_TAG)" >> "$GITHUB_STEP_SUMMARY"
+          echo "Example: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/$RELEASE_TAG/pyxis-example.pyx" >> "$GITHUB_STEP_SUMMARY"

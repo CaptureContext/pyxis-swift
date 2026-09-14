@@ -1,0 +1,107 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)
+// swift-module-flags: -target arm64-apple-ios17.0-simulator -enable-objc-interop -language-mode 6 -O -enable-experimental-feature DebugDescriptionMacro -module-name PyxisCore -package-name pyxis_swift
+// swift-module-flags-ignorable:  -formal-cxx-interoperability-mode=off -interface-compiler-version 6.4
+import Foundation
+import PyxisModel
+import Swift
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+@propertyWrapper public struct Pyxis<Value> : Swift::Sendable where Value : Swift::Sendable {
+  private let read: @Sendable (PyxisCore::PyxisConfiguration) -> Value
+  public init<Key>(_ key: Key.Type) where Value == Key.Value, Key : PyxisCore::PyxisConfigurationKey
+  public init(_ keyPath: any Swift::KeyPath<PyxisCore::PyxisConfiguration, Value> & Swift::Sendable)
+  public var wrappedValue: Value {
+    get
+  }
+}
+public enum PyxisBootstrapError : Swift::Error, Swift::Equatable {
+  case unsupportedVersion(Swift::Int)
+  case alreadyPrepared
+  case preparationInProgress
+  case invalidReport(Swift::String)
+  @_semantics("derived_enum_equals") @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_enum_equals(_ a: PyxisCore::PyxisBootstrapError, _ b: PyxisCore::PyxisBootstrapError) -> Swift::Bool
+}
+public struct PyxisBootstrapReport : Swift::Codable, Swift::Equatable, Swift::Sendable {
+  public var variants: [Swift::String : PyxisModel::PyxisVariantResult]
+  public init(variants: [Swift::String : PyxisModel::PyxisVariantResult])
+  public init(encoded string: Swift::String) throws
+  public func encoded() throws -> Swift::String
+  public func covering(_ requested: PyxisModel::PyxisVariants) -> PyxisCore::PyxisBootstrapReport
+  @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisCore::PyxisBootstrapReport, _ b: PyxisCore::PyxisBootstrapReport) -> Swift::Bool
+  public func encode(to encoder: any Swift::Encoder) throws
+  public init(from decoder: any Swift::Decoder) throws
+}
+public struct PyxisConfiguration : Swift::Sendable {
+  private var values: [Swift::ObjectIdentifier : any Swift::Sendable]
+  @_hasStorage public var requested: PyxisModel::PyxisVariants {
+    get
+  }
+  @_hasStorage @_hasInitialValue public var report: PyxisCore::PyxisBootstrapReport? {
+    get
+  }
+  public init()
+  public subscript<Key>(key: Key.Type) -> Key.Value where Key : PyxisCore::PyxisConfigurationKey {
+    get
+    set
+  }
+}
+public protocol PyxisConfigurationKey : Swift::Sendable {
+  associatedtype Value : Swift::Sendable
+  static var defaultValue: Self.Value { get }
+}
+public var pyxisConfiguration: PyxisCore::PyxisConfiguration {
+  get
+}
+extension PyxisCore::PyxisRecordingEnvironment {
+  public enum Key : Swift::String, Swift::CaseIterable, Swift::Sendable {
+    case variants
+    case profileOrder
+    case runID
+    case runTimestamp
+    case deviceName
+    case deviceModel
+    @inlinable public init?(rawValue: Swift::String)
+    public typealias AllCases = [PyxisCore::PyxisRecordingEnvironment.PyxisCore::Key]
+    public typealias RawValue = Swift::String
+    nonisolated public static var allCases: [PyxisCore::PyxisRecordingEnvironment.PyxisCore::Key] {
+      get
+    }
+    public var rawValue: Swift::String {
+      @inlinable get
+    }
+  }
+}
+public struct PyxisRecordingEnvironment : Swift::Equatable, Swift::Sendable {
+  @_hasInitialValue public var variants: PyxisModel::PyxisVariants?
+  @_hasInitialValue public var profileOrder: Swift::Int?
+  @_hasInitialValue public var runID: Swift::String?
+  @_hasInitialValue public var runCreatedAt: Foundation::Date?
+  @_hasInitialValue public var deviceName: Swift::String?
+  @_hasInitialValue public var deviceModel: Swift::String?
+  public init(variants: PyxisModel::PyxisVariants? = nil, profileOrder: Swift::Int? = nil, runID: Swift::String? = nil, runCreatedAt: Foundation::Date? = nil, deviceName: Swift::String? = nil, deviceModel: Swift::String? = nil)
+  public init(environment: [Swift::String : Swift::String]) throws
+  public func encoded() throws -> [Swift::String : Swift::String]
+  @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisCore::PyxisRecordingEnvironment, _ b: PyxisCore::PyxisRecordingEnvironment) -> Swift::Bool
+}
+public enum PyxisRecordingEnvironmentError : Swift::Error, Swift::Equatable {
+  case invalidValue(PyxisCore::PyxisRecordingEnvironment.PyxisCore::Key)
+  @_semantics("derived_enum_equals") @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_enum_equals(_ a: PyxisCore::PyxisRecordingEnvironmentError, _ b: PyxisCore::PyxisRecordingEnvironmentError) -> Swift::Bool
+}
+@_hasInitialValue public let pyxisEnvironmentKey: Swift::String
+@discardableResult
+public func withPyxis<Result>(_ update: (inout PyxisCore::PyxisConfiguration) throws -> Swift::Void, operation: () throws -> Result) rethrows -> Result
+@discardableResult
+public func withPyxis<Result>(_ configuration: PyxisCore::PyxisConfiguration, operation: () throws -> Result) rethrows -> Result
+#if compiler(>=5.3) && $AsyncExecutionBehaviorAttributes
+@discardableResult
+public func withPyxis<Result>(isolation: isolated (any _Concurrency::Actor)? = #isolation, _ update: (inout PyxisCore::PyxisConfiguration) throws -> Swift::Void, operation: nonisolated(nonsending) () async throws -> Result) async rethrows -> Result
+#endif
+#if compiler(>=5.3) && $AsyncExecutionBehaviorAttributes
+@discardableResult
+public func withPyxis<Result>(isolation: isolated (any _Concurrency::Actor)? = #isolation, _ configuration: PyxisCore::PyxisConfiguration, operation: nonisolated(nonsending) () async throws -> Result) async rethrows -> Result
+#endif
+extension PyxisCore::PyxisRecordingEnvironment.PyxisCore::Key : Swift::Equatable {}
+extension PyxisCore::PyxisRecordingEnvironment.PyxisCore::Key : Swift::Hashable {}
+extension PyxisCore::PyxisRecordingEnvironment.PyxisCore::Key : Swift::RawRepresentable {}

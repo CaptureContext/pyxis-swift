@@ -1,0 +1,34 @@
+version: 1
+xcode:
+  workspace: PyxisExample.xcworkspace
+  scheme: PyxisExample
+  only_testing:
+    - PyxisExampleUITests/MatrixUITests
+  build_arguments:
+    - CODE_SIGNING_ALLOWED=NO
+    - -skipMacroValidation
+    - -skipPackagePluginValidation
+  test_arguments: [-testLanguage, en, -testRegion, US]
+devices:
+  - name: iPhone 18 Pro
+  - name: iPhone SE 2
+    simulator: iPhone SE (2nd generation)
+  - name: iPhone Duo
+    optional: true
+# The first values and first device form the default viewer profile.
+variants:
+  color_scheme: [dark, light]
+  layout_direction: [ltr, rtl]
+  accessibility.content_size: [large, xxx_large]
+  subscription.status: [trial]
+output: ../.generated/recordings
+storage:
+  path: ../.generated/ExampleRecordingStore
+  context: example
+  policy: merge
+derived_data: ../.generated/ExampleDerivedData
+images:
+  width: 240
+  jpeg_quality: 0.5
+coverage:
+  states: [home, detail, notebooks, notebooks_empty, editor_empty, editor_keyboard, settings, subscription]

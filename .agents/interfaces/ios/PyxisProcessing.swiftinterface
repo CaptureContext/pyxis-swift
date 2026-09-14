@@ -1,0 +1,86 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)
+// swift-module-flags: -target arm64-apple-ios17.0-simulator -enable-objc-interop -language-mode 6 -O -enable-experimental-feature DebugDescriptionMacro -module-name PyxisProcessing -package-name pyxis_swift
+// swift-module-flags-ignorable:  -formal-cxx-interoperability-mode=off -interface-compiler-version 6.4
+import CryptoKit
+import Darwin
+import Foundation
+import ImageIO
+import PyxisModel
+import Swift
+import ZIPFoundation
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+public enum BundlePublisher {
+  public static func publish(inputs: [PyxisProcessing::PyxisBundleInput], to output: Foundation::URL) throws -> PyxisModel::PyxisMapDocument
+}
+public enum BundleValidator {
+  public static func validate(document: PyxisModel::PyxisMapDocument, root: Foundation::URL) throws
+  public static func assetData(_ asset: PyxisModel::PyxisAsset, root: Foundation::URL) throws -> Foundation::Data
+  public static func assetURL(path: Swift::String, root: Foundation::URL) throws -> Foundation::URL
+}
+public enum MapMerger {
+  public static func merge(_ documents: [PyxisModel::PyxisMapDocument]) throws -> PyxisModel::PyxisMapDocument
+}
+public struct PyxisArchive : Swift::Sendable {
+  @inlinable public init() {}
+  public func write(_ input: PyxisProcessing::PyxisBundleInput, to output: Foundation::URL) throws
+  public func extract(from source: Foundation::URL, to output: Foundation::URL) throws -> PyxisProcessing::PyxisBundleInput
+}
+public struct PyxisBundleInput : Swift::Sendable {
+  public var document: PyxisModel::PyxisMapDocument
+  public var root: Foundation::URL
+  @inlinable public init(document: PyxisModel::PyxisMapDocument, root: Foundation::URL) {
+		self.document = document
+		self.root = root
+	}
+}
+public struct PyxisPublicationCleanupError : Swift::Error, Swift::CustomStringConvertible, Swift::Sendable {
+  public let publishedAt: Foundation::URL
+  public let previousBundleAt: Foundation::URL
+  @inlinable public init(publishedAt: Foundation::URL, previousBundleAt: Foundation::URL) {
+		self.publishedAt = publishedAt
+		self.previousBundleAt = previousBundleAt
+	}
+  public var description: Swift::String {
+    get
+  }
+}
+public struct PyxisRecordingStore : Swift::Sendable {
+  public let root: Foundation::URL
+  @inlinable public init(root: Foundation::URL) {
+		self.root = root
+	}
+  public func snapshot(context: Swift::String = "default") throws -> PyxisProcessing::PyxisStoredRecording?
+  public func snapshot(id: Swift::String) throws -> PyxisProcessing::PyxisStoredRecording
+  @discardableResult
+  public func update(_ input: PyxisProcessing::PyxisBundleInput, context: Swift::String = "default", policy: PyxisProcessing::PyxisStorePolicy = .merge) throws -> PyxisProcessing::PyxisStoredRecording
+}
+public enum PyxisStorePolicy : Swift::String, Swift::Codable, Swift::Sendable {
+  case merge
+  case update
+  @inlinable public init?(rawValue: Swift::String)
+  public typealias RawValue = Swift::String
+  public var rawValue: Swift::String {
+    @inlinable get
+  }
+}
+public struct PyxisStoredRecording : Swift::Sendable {
+  public let id: Swift::String
+  public let bundle: PyxisProcessing::PyxisBundleInput
+  @inlinable public init(id: Swift::String, bundle: PyxisProcessing::PyxisBundleInput) {
+		self.id = id
+		self.bundle = bundle
+	}
+}
+public enum StableID {
+  public static func digest(parts: [Swift::String]) -> Swift::String
+  public static func observation(projectID: Swift::String, runID: Swift::String, journeyID: Swift::String, testName: Swift::String, profileID: Swift::String, attempt: Swift::Int) -> Swift::String
+  public static func capture(observationID: Swift::String, stateID: Swift::String, occurrence: Swift::Int) -> Swift::String
+  public static func transition(observationID: Swift::String, sequence: Swift::Int) -> Swift::String
+  public static func sha256(_ data: Foundation::Data) -> Swift::String
+}
+extension PyxisProcessing::PyxisStorePolicy : Swift::Equatable {}
+extension PyxisProcessing::PyxisStorePolicy : Swift::Hashable {}
+extension PyxisProcessing::PyxisStorePolicy : Swift::RawRepresentable {}

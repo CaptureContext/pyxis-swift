@@ -1,0 +1,41 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)
+// swift-module-flags: -target arm64-apple-macos14.0 -enable-objc-interop -language-mode 6 -O -enable-experimental-feature DebugDescriptionMacro -module-name PyxisXCTest -package-name pyxis_swift
+// swift-module-flags-ignorable:  -formal-cxx-interoperability-mode=off -interface-compiler-version 6.4
+@_exported import PyxisCore/*.Pyxis*/
+@_exported import PyxisCore/*.PyxisBootstrapError*/
+@_exported import PyxisCore/*.PyxisBootstrapReport*/
+@_exported import PyxisCore/*.PyxisConfiguration*/
+@_exported import PyxisCore/*.PyxisConfigurationKey*/
+@_exported import PyxisCore/*.PyxisRecordingEnvironment*/
+@_exported import PyxisCore/*.PyxisRecordingEnvironmentError*/
+@_exported import PyxisCore/*.pyxisConfiguration*/
+@_exported import PyxisCore/*.pyxisEnvironmentKey*/
+@_exported import PyxisCore/*.withPyxis*/
+import PyxisModel
+import Swift
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+public struct PyxisRecordingConfiguration : Swift::Sendable {
+  public var project: PyxisModel::PyxisProject
+  public var run: PyxisModel::PyxisRunMetadata
+  public var domains: [PyxisModel::PyxisDomain]
+  public var profile: PyxisModel::PyxisProfile
+  @_hasInitialValue public var journeyID: Swift::String?
+  @_hasInitialValue public var title: Swift::String?
+  public var attempt: Swift::Int
+  public var screenshotSource: PyxisXCTest::PyxisScreenshotSource
+  public init(project: PyxisModel::PyxisProject, run: PyxisModel::PyxisRunMetadata, domains: [PyxisModel::PyxisDomain], profile: PyxisModel::PyxisProfile, journeyID: Swift::String? = nil, title: Swift::String? = nil, attempt: Swift::Int = 0, screenshotSource: PyxisXCTest::PyxisScreenshotSource = .application)
+}
+public enum PyxisScreenshotSource : Swift::Sendable {
+  case application
+  case screen
+  @_semantics("derived_enum_equals") @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_enum_equals(_ a: PyxisXCTest::PyxisScreenshotSource, _ b: PyxisXCTest::PyxisScreenshotSource) -> Swift::Bool
+  public func hash(into hasher: inout Swift::Hasher)
+  public var hashValue: Swift::Int {
+    get
+  }
+}
+extension PyxisXCTest::PyxisScreenshotSource : Swift::Equatable {}
+extension PyxisXCTest::PyxisScreenshotSource : Swift::Hashable {}

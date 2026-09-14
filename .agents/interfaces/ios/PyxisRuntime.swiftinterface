@@ -1,0 +1,27 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)
+// swift-module-flags: -target arm64-apple-ios17.0-simulator -enable-objc-interop -language-mode 6 -O -enable-experimental-feature DebugDescriptionMacro -module-name PyxisRuntime -package-name pyxis_swift
+// swift-module-flags-ignorable:  -formal-cxx-interoperability-mode=off -interface-compiler-version 6.4
+import Foundation
+import PyxisCore
+@_exported import PyxisCore/*.Pyxis*/
+@_exported import PyxisCore/*.PyxisBootstrapError*/
+@_exported import PyxisCore/*.PyxisBootstrapReport*/
+@_exported import PyxisCore/*.PyxisConfiguration*/
+@_exported import PyxisCore/*.PyxisConfigurationKey*/
+@_exported import PyxisCore/*.pyxisConfiguration*/
+@_exported import PyxisCore/*.pyxisEnvironmentKey*/
+@_exported import PyxisCore/*.withPyxis*/
+import PyxisModel
+import Swift
+import UIKit
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+public typealias PyxisAdapter = @_Concurrency::MainActor @Sendable (Swift::String) throws -> PyxisModel::PyxisVariantResult
+@discardableResult
+@_Concurrency::MainActor public func applyPyxis(to window: UIKit::UIWindow, configuration: PyxisCore::PyxisConfiguration = pyxisConfiguration, adapters: [Swift::String : PyxisRuntime::PyxisAdapter] = [:]) throws -> PyxisCore::PyxisBootstrapReport?
+@_Concurrency::MainActor public func observedPyxisAccessibility() -> [Swift::String : PyxisModel::PyxisVariantResult]
+@discardableResult
+@_Concurrency::MainActor public func preparePyxis(environment: [Swift::String : Swift::String] = ProcessInfo.processInfo.environment, adapters: [Swift::String : PyxisRuntime::PyxisAdapter] = [:], configure: (inout PyxisCore::PyxisConfiguration) throws -> Swift::Void = { _ in }) throws -> PyxisCore::PyxisBootstrapReport?
+@_Concurrency::MainActor public func pyxisWindowAdapters(_ window: UIKit::UIWindow) -> [Swift::String : PyxisRuntime::PyxisAdapter]

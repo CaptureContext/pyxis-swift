@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pyxis.invalid/format/artifact-1.schema.json",
+  "title": "Pyxis regular artifact 1",
+  "type": "object",
+  "properties": {
+    "format": {
+      "const": "pyxis.artifact"
+    },
+    "version": {
+      "const": 1
+    },
+    "type": {
+      "const": "regular"
+    }
+  },
+  "required": [
+    "format",
+    "version",
+    "type"
+  ]
+}

@@ -1,0 +1,105 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)
+// swift-module-flags: -target arm64-apple-ios17.0-simulator -enable-objc-interop -language-mode 6 -O -enable-experimental-feature DebugDescriptionMacro -module-name PyxisXCTest -package-name pyxis_swift
+// swift-module-flags-ignorable:  -formal-cxx-interoperability-mode=off -interface-compiler-version 6.4
+import AsyncXCUIAutomation
+import Foundation
+import PyxisCore
+@_exported import PyxisCore/*.Pyxis*/
+@_exported import PyxisCore/*.PyxisBootstrapError*/
+@_exported import PyxisCore/*.PyxisBootstrapReport*/
+@_exported import PyxisCore/*.PyxisConfiguration*/
+@_exported import PyxisCore/*.PyxisConfigurationKey*/
+@_exported import PyxisCore/*.PyxisRecordingEnvironment*/
+@_exported import PyxisCore/*.PyxisRecordingEnvironmentError*/
+@_exported import PyxisCore/*.pyxisConfiguration*/
+@_exported import PyxisCore/*.pyxisEnvironmentKey*/
+@_exported import PyxisCore/*.withPyxis*/
+import PyxisModel
+import PyxisProcessing
+import Swift
+import UIKit
+import XCTest
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+@_Concurrency::MainActor final public class PyxisRecorder {
+  @_Concurrency::MainActor final private let testCase: XCTest::XCTestCase
+  @_Concurrency::MainActor final private let screenshotSource: PyxisXCTest::PyxisScreenshotSource
+  @_Concurrency::MainActor final private var sequence: Swift::Int
+  @_Concurrency::MainActor final private var revision: Swift::Int
+  @_Concurrency::MainActor final private var isFinished: Swift::Bool
+  @_Concurrency::MainActor final private var isRecording: Swift::Bool
+  @_Concurrency::MainActor final public let app: XCUIAutomation::XCUIApplication
+  @_hasStorage @_Concurrency::MainActor final public var document: PyxisModel::PyxisMapDocument {
+    get
+  }
+  @_Concurrency::MainActor convenience public init(testCase: XCTest::XCTestCase, app: XCUIAutomation::XCUIApplication, configuration: PyxisXCTest::PyxisRecordingConfiguration, report: PyxisCore::PyxisBootstrapReport = .init(variants: [:]))
+  @_Concurrency::MainActor public init(testCase: XCTest::XCTestCase, app: XCUIAutomation::XCUIApplication, project: PyxisModel::PyxisProject, run: PyxisModel::PyxisRunMetadata, domains: [PyxisModel::PyxisDomain], profile: PyxisModel::PyxisProfile, journeyID: Swift::String, title: Swift::String, attempt: Swift::Int = 0, report: PyxisCore::PyxisBootstrapReport = .init(variants: [:]), screenshotSource: PyxisXCTest::PyxisScreenshotSource = .application)
+  @_Concurrency::MainActor final public func launch(configure: @_Concurrency::MainActor @Sendable (XCUIAutomation::XCUIApplication) async throws -> Swift::Void = { _ in }, ready: @_Concurrency::MainActor @Sendable () async throws -> Swift::Void = {}, readReport: @_Concurrency::MainActor @Sendable () async throws -> PyxisCore::PyxisBootstrapReport? = { nil }) async throws
+  @_Concurrency::MainActor final public func configureLaunch() throws
+  @_Concurrency::MainActor final public func updateReport(_ report: PyxisCore::PyxisBootstrapReport) throws
+  @_Concurrency::MainActor final public func capture(_ state: PyxisModel::PyxisState, ready: () throws -> Swift::Void = {}) throws
+  @_Concurrency::MainActor final public func transition(from source: PyxisModel::PyxisState, to destination: PyxisModel::PyxisState, action: Swift::String, kind: Swift::String = "navigation", ready: () throws -> Swift::Void = {}, perform: () throws -> Swift::Void) throws
+  @_Concurrency::MainActor final public func capture(_ state: PyxisModel::PyxisState, ready: @_Concurrency::MainActor @Sendable () async throws -> Swift::Void = {}) async throws
+  @_Concurrency::MainActor final public func transition(from source: PyxisModel::PyxisState, to destination: PyxisModel::PyxisState, action: Swift::String, kind: Swift::String = "navigation", ready: @_Concurrency::MainActor @Sendable () async throws -> Swift::Void = {}, perform: @_Concurrency::MainActor @Sendable () async throws -> Swift::Void) async throws
+  @_Concurrency::MainActor final public func finish(status: PyxisModel::PyxisObservationStatus = .passed, failure: Swift::String? = nil) throws
+  @_Concurrency::MainActor final public func require(_ element: XCUIAutomation::XCUIElement, timeout: Foundation::TimeInterval = 5) throws
+  @_Concurrency::MainActor final public func require(_ element: XCUIAutomation::XCUIElement, timeout: Swift::Duration = .seconds(5)) async throws
+  @objc deinit
+}
+public enum PyxisRecorderError : Swift::Error {
+  case sourceNotCaptured(Swift::String)
+  case readinessTimedOut(Swift::String)
+  case conflictingState(Swift::String)
+  case alreadyFinished
+  case recordingInProgress
+  case missingTestConfiguration
+  case recordedXCTestFailure
+}
+public struct PyxisRecordingConfiguration : Swift::Sendable {
+  public var project: PyxisModel::PyxisProject
+  public var run: PyxisModel::PyxisRunMetadata
+  public var domains: [PyxisModel::PyxisDomain]
+  public var profile: PyxisModel::PyxisProfile
+  @_hasInitialValue public var journeyID: Swift::String?
+  @_hasInitialValue public var title: Swift::String?
+  public var attempt: Swift::Int
+  public var screenshotSource: PyxisXCTest::PyxisScreenshotSource
+  public init(project: PyxisModel::PyxisProject, run: PyxisModel::PyxisRunMetadata, domains: [PyxisModel::PyxisDomain], profile: PyxisModel::PyxisProfile, journeyID: Swift::String? = nil, title: Swift::String? = nil, attempt: Swift::Int = 0, screenshotSource: PyxisXCTest::PyxisScreenshotSource = .application)
+}
+public enum PyxisScreenshotSource : Swift::Sendable {
+  case application
+  case screen
+  @_semantics("derived_enum_equals") @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_enum_equals(_ a: PyxisXCTest::PyxisScreenshotSource, _ b: PyxisXCTest::PyxisScreenshotSource) -> Swift::Bool
+  public func hash(into hasher: inout Swift::Hasher)
+  public var hashValue: Swift::Int {
+    get
+  }
+}
+@objc @_inheritsConvenienceInitializers open class PyxisTestCase : XCTest::XCTestCase {
+  @_Concurrency::MainActor @_hasInitialValue private var _app: XCUIAutomation::XCUIApplication?
+  @_Concurrency::MainActor @_hasInitialValue private var _recorder: PyxisXCTest::PyxisRecorder?
+  @objc override dynamic open func setUp() async throws
+  @_Concurrency::MainActor open var recordingConfiguration: PyxisXCTest::PyxisRecordingConfiguration? {
+    get
+  }
+  @_Concurrency::MainActor open func makeRecordingConfiguration() throws -> PyxisXCTest::PyxisRecordingConfiguration
+  @objc @_Concurrency::MainActor final public var app: XCUIAutomation::XCUIApplication {
+    @objc get
+  }
+  @_Concurrency::MainActor final public var recorder: PyxisXCTest::PyxisRecorder {
+    get
+  }
+  @objc @_Concurrency::MainActor open func makeApplication() -> XCUIAutomation::XCUIApplication
+  @objc @_Concurrency::MainActor open func configureApplication(_ app: XCUIAutomation::XCUIApplication) async throws
+  @objc @_Concurrency::MainActor open func waitUntilReady() async throws
+  @_Concurrency::MainActor open func readBootstrapReport() async throws -> PyxisCore::PyxisBootstrapReport?
+  @objc override dynamic public init(invocation: Foundation::NSInvocation?)
+  @objc override dynamic public init(selector: ObjectiveC::Selector)
+  @objc override dynamic public init()
+  @objc deinit
+}
+extension PyxisXCTest::PyxisRecorder : Swift::Sendable {}
+extension PyxisXCTest::PyxisScreenshotSource : Swift::Equatable {}
+extension PyxisXCTest::PyxisScreenshotSource : Swift::Hashable {}

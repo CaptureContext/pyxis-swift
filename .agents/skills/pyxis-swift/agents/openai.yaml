@@ -1,0 +1,4 @@
+interface:
+  display_name: "Pyxis Swift"
+  short_description: "Record and export iOS app journeys"
+  default_prompt: "Use $pyxis-swift to integrate Pyxis into this app and export its UI journeys."
