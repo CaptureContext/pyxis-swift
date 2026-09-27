@@ -8,6 +8,7 @@ public struct PyxisRecordingConfiguration: Sendable {
 	public var profile: PyxisProfile
 	public var journeyID: String?
 	public var title: String?
+	public var recordingKey: String?
 	public var attempt: Int
 	public var screenshotSource: PyxisScreenshotSource
 
@@ -19,6 +20,7 @@ public struct PyxisRecordingConfiguration: Sendable {
 		journeyID: String? = nil,
 		title: String? = nil,
 		attempt: Int = 0,
+		recordingKey: String? = nil,
 		screenshotSource: PyxisScreenshotSource = .application
 	) {
 		self.project = project
@@ -28,6 +30,7 @@ public struct PyxisRecordingConfiguration: Sendable {
 		self.journeyID = journeyID
 		self.title = title
 		self.attempt = attempt
+		self.recordingKey = recordingKey
 		self.screenshotSource = screenshotSource
 	}
 }

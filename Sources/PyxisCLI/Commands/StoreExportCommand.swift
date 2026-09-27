@@ -4,7 +4,7 @@ import PyxisProcessing
 
 internal struct StoreExportCommand: ParsableCommand {
 	internal static let configuration: CommandConfiguration = .init(
-		commandName: "export", abstract: "Export a store context or retained snapshot as a regular .pyx."
+		commandName: "export", abstract: "Export a store context or retained snapshot as a composed .pyx."
 	)
 
 	@OptionGroup
@@ -13,7 +13,7 @@ internal struct StoreExportCommand: ParsableCommand {
 	@Option(name: .long, help: "Retained snapshot ID. Omit to export the context's current snapshot.")
 	internal var snapshot: String?
 
-	@Option(name: .long, help: "New regular .pyx file to write.")
+	@Option(name: .long, help: "New composed .pyx file to write.")
 	internal var output: String
 
 	internal init() {}
@@ -31,7 +31,7 @@ internal struct StoreExportCommand: ParsableCommand {
 			result = try options.store.snapshot(context: options.context)
 		}
 		guard let result else { throw CLIError.operation("No recording in context \(options.context)") }
-		try PyxisArchive().write(result.bundle, to: URL(fileURLWithPath: output))
+		try PyxisArchive().write(result.recordings, to: URL(fileURLWithPath: output))
 		print("Archive: \(output) (snapshot \(result.id))")
 	}
 }

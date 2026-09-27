@@ -6,7 +6,7 @@ import Testing
 @Suite
 struct RecordingCoverageTests {
 	@Test
-	func missingStatesAndProfilesMakeTheReportIncomplete() throws {
+	func missingConfigurationsFailButLegacyStateChecklistIsIgnored() throws {
 		var document: PyxisMapDocument = .init(
 			project: .init(id: "example", title: "Example"),
 			run: .init(id: "run", createdAt: Date(timeIntervalSince1970: 0)),
@@ -24,11 +24,13 @@ struct RecordingCoverageTests {
 		let expected: RecordingCoverageConfiguration = .init(states: ["home", "settings"])
 		let incomplete = RecordingCoverageReport(document: document, configuration: expected, plan: plan)
 		#expect(!incomplete.complete)
-		#expect(incomplete.problems.contains { $0.contains("settings") })
+		#expect(!incomplete.problems.contains { $0.contains("settings") })
 		#expect(incomplete.problems.contains { $0.contains("color_scheme=dark") })
 		plan = .init(devices: [], skipped: [], selections: [plan.selections[0]])
+		#expect(!RecordingCoverageReport(document: document, configuration: nil, plan: plan, testSelectors: ["Target/Tests/missing"]).complete)
+		#expect(RecordingCoverageReport(document: document, configuration: nil, plan: plan, testSelectors: ["Target/Tests/testTour"]).complete)
 		let narrow: RecordingCoverageConfiguration = .init(states: ["home"])
-		#expect(RecordingCoverageReport(document: document, configuration: narrow, plan: plan).complete)
+		#expect(RecordingCoverageReport(document: document, configuration: expected, plan: plan).complete)
 		document.observations[0].variants["color_scheme"] = .init(status: .unsupported, value: "light")
 		#expect(!RecordingCoverageReport(document: document, configuration: narrow, plan: plan).complete)
 	}

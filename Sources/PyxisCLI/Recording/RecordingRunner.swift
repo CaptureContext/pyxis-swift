@@ -27,7 +27,12 @@ internal struct RecordingRunner {
 		return try .init(requests: configuration.devices, deviceTypes: types["devicetypes"] ?? [], runtimes: runtimes["runtimes"] ?? [], variants: configuration.variants)
 	}
 
-	internal func record(plan: RecordingPlan, skipBuild: Bool) async throws {
+	internal func record(
+		plan: RecordingPlan,
+		skipBuild: Bool,
+		onlyTesting: [String] = [],
+		updateStore: Bool = false
+	) async throws {
 		var publication: PublicationOptions = configuration.images?.publication ?? .init(imageWidth: nil)
 		if let ffmpeg = publication.ffmpeg { publication.ffmpeg = resolve(ffmpeg).path }
 		try publication.preflight()
@@ -89,7 +94,7 @@ internal struct RecordingRunner {
 						["xcodebuild", "test-without-building", "-xctestrun", testFile.path,
 							"-destination", "platform=iOS Simulator,id=\(identifier)",
 							"-parallel-testing-enabled", "NO", "-resultBundlePath", result.path,
-						] + xcode.onlyTesting.map { "-only-testing:\($0)" } + (xcode.testArguments ?? []),
+							] + (onlyTesting.isEmpty ? xcode.onlyTesting : onlyTesting).map { "-only-testing:\($0)" } + (xcode.testArguments ?? []),
 						folder.appendingPathComponent("tests.log"), [:]
 					)
 					if status != 0 { failures.append("\(destination.name): xcodebuild exited \(status).") }
@@ -111,18 +116,18 @@ internal struct RecordingRunner {
 		guard !bundles.isEmpty
 		else { throw CLIError.operation("No recordings could be exported. \(failures.joined(separator: "\n"))\nResults: \(output.path)") }
 		var merged: PublicationOptions = .init(imageWidth: nil)
-		if configuration.archive != false, configuration.storage == nil {
+		if configuration.archive != false {
 			merged.archive = output.appendingPathComponent("recording.pyx").path
 		}
 		// Images are already prepared per device; merging must not recompress them.
 		let document: PyxisMapDocument = try await merged.publish(inputs: bundles, to: output.appendingPathComponent("bundle"))
-		let report: RecordingCoverageReport = .init(document: document, configuration: configuration.coverage, plan: plan)
+		let report: RecordingCoverageReport = .init(document: document, configuration: configuration.coverage, plan: plan, testSelectors: onlyTesting.isEmpty ? xcode.onlyTesting : onlyTesting)
 		try writeJSON(report, to: output.appendingPathComponent("coverage.json"))
 		printProgress("Published \(document.profiles.count) profiles, \(document.states.count) states and \(document.captures.count) captures.")
 		guard failures.isEmpty, report.complete else {
 			throw CLIError.operation("Recording is incomplete. \((failures + report.problems).joined(separator: "\n"))\nPartial recording and diagnostics: \(output.path)")
 		}
-		if let storage = configuration.storage {
+		if updateStore, let storage = configuration.storage {
 			let store: PyxisRecordingStore = .init(root: resolve(storage.path))
 			let snapshot: PyxisStoredRecording = try store.update(
 				.init(document: document, root: output.appendingPathComponent("bundle")),
@@ -132,11 +137,6 @@ internal struct RecordingRunner {
 				"snapshot_id": snapshot.id, "context": storage.context, "path": store.root.path,
 			], to: output.appendingPathComponent("storage-result.json"))
 			printProgress("Stored snapshot \(snapshot.id) in \(store.root.path) [\(storage.context)].")
-			if configuration.archive != false {
-				let archive: URL = output.appendingPathComponent("recording.pyx")
-				try PyxisArchive().write(snapshot.bundle, to: archive)
-				printProgress("Archive: \(archive.path)")
-			}
 		}
 	}
 

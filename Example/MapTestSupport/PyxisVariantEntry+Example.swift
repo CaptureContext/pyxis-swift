@@ -1,4 +1,5 @@
-import ExampleTesting
+import PyxisCore
+import PyxisModel
 
 extension PyxisVariantEntry {
 	internal static var subscriptionKey: String { "subscription.status" }

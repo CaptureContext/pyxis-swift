@@ -53,7 +53,6 @@ internal struct RecordingConfiguration: Decodable {
 		else { throw CLIError.operation("Recording devices must be unique.") }
 		try images?.publication.validate()
 		try variants.validate(deviceNames: Set(identities))
-		try coverage?.validate()
 		try storage?.validate()
 	}
 

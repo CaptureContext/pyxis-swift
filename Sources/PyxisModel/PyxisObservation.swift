@@ -11,6 +11,8 @@ public struct PyxisObservation: Codable, Equatable, Sendable {
 	public var startedAt: Date?
 	public var failure: String?
 	public var runID: String?
+	public var recordingKey: String?
+	public var producer: PyxisRecordingProducer?
 
 	@inlinable
 	public init(
@@ -23,7 +25,9 @@ public struct PyxisObservation: Codable, Equatable, Sendable {
 		variants: [String: PyxisVariantResult] = [:],
 		startedAt: Date? = nil,
 		failure: String? = nil,
-		runID: String? = nil
+		runID: String? = nil,
+		recordingKey: String? = nil,
+		producer: PyxisRecordingProducer? = nil
 	) {
 		self.id = id
 		self.journeyID = journeyID
@@ -35,6 +39,8 @@ public struct PyxisObservation: Codable, Equatable, Sendable {
 		self.startedAt = startedAt
 		self.failure = failure
 		self.runID = runID
+		self.recordingKey = recordingKey
+		self.producer = producer
 	}
 
 	public init(from decoder: any Decoder) throws {
@@ -50,7 +56,9 @@ public struct PyxisObservation: Codable, Equatable, Sendable {
 			variants: container.decode([String: PyxisVariantResult].self, forKey: .variants),
 			startedAt: container.contains(.startedAt) ? container.decode(ISO8601Timestamp.self, forKey: .startedAt).value : nil,
 			failure: container.contains(.failure) ? container.decode(String.self, forKey: .failure) : nil,
-			runID: container.contains(.runID) ? container.decode(String.self, forKey: .runID) : nil
+			runID: container.contains(.runID) ? container.decode(String.self, forKey: .runID) : nil,
+			recordingKey: container.contains(.recordingKey) ? container.decode(String.self, forKey: .recordingKey) : nil,
+			producer: container.contains(.producer) ? container.decode(PyxisRecordingProducer.self, forKey: .producer) : nil
 		)
 	}
 
@@ -66,6 +74,8 @@ public struct PyxisObservation: Codable, Equatable, Sendable {
 		try container.encodeIfPresent(self.startedAt.map(ISO8601Timestamp.init), forKey: .startedAt)
 		try container.encodeIfPresent(self.failure, forKey: .failure)
 		try container.encodeIfPresent(self.runID, forKey: .runID)
+		try container.encodeIfPresent(self.recordingKey, forKey: .recordingKey)
+		try container.encodeIfPresent(self.producer, forKey: .producer)
 	}
 
 	private enum CodingKeys: String, CodingKey {
@@ -79,5 +89,7 @@ public struct PyxisObservation: Codable, Equatable, Sendable {
 		case startedAt = "started_at"
 		case failure
 		case runID = "run_id"
+		case recordingKey = "recording_key"
+		case producer
 	}
 }

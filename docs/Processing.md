@@ -23,6 +23,6 @@ See the [format contract](../Format/README.md) for stable-ID framing and cross-l
 
 ## Regular artifacts and persistent storage
 
-`PyxisArchive().write(_:to:)` packages a regular `.pyx`; `extract(from:to:)` validates and extracts into a new directory. ZIPFoundation handles ZIP entry compression and extraction; only referenced assets are extracted, one image at a time. `PyxisArtifact` owns the separately versioned container descriptor.
+`PyxisArchive().write(_:to:)` packages nested test/variation `.pyx` archives; `extractRecordings(from:to:)` validates and returns original leaves from different runs. `extract(from:to:)` is a convenience only for compatible same-run leaves. ZIPFoundation handles ZIP entry compression and extraction; only referenced assets are extracted, one image at a time. `PyxisArtifact` owns the separately versioned container descriptor.
 
 `PyxisRecordingStore` stores immutable image assets and complete metadata snapshots at an explicit filesystem URL. Named contexts advance atomically. Merge replaces selected journey/test/variant scopes while preserving unselected recordings and their original run provenance. See [Storage.md](Storage.md).

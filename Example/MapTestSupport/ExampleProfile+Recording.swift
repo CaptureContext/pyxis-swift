@@ -1,6 +1,6 @@
 import Foundation
-import XCTest
-import ExampleTesting
+import PyxisCore
+import PyxisModel
 
 internal extension ExampleProfile {
 	init(recordingEnvironment environment: [String: String]) throws {
@@ -27,8 +27,9 @@ internal extension ExampleProfile {
 			direction: decode(LayoutDirection.self, for: PyxisVariantEntry.layoutDirectionKey),
 			contentSize: decode(ContentSize.self, for: PyxisVariantEntry.accessibilityContentSizeKey)
 		)
-		XCTAssertEqual(values[PyxisVariantEntry.deviceKey], environment.deviceName)
-		XCTAssertEqual(values[PyxisVariantEntry.subscriptionKey], ExampleSubscription.trial.rawValue)
+		guard values[PyxisVariantEntry.deviceKey] == environment.deviceName,
+			values[PyxisVariantEntry.subscriptionKey] == ExampleSubscription.trial.rawValue
+		else { throw PyxisValidationError("Mismatched Example device or subscription") }
 	}
 
 	var recording: PyxisProfile {

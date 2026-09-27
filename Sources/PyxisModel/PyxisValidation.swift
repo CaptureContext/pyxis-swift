@@ -75,6 +75,13 @@ public enum PyxisValidation {
 		}
 
 		for observation in document.observations {
+			if let recordingKey = observation.recordingKey {
+				try nonempty(recordingKey, "observation.recording_key")
+			}
+			if let producer = observation.producer {
+				try nonempty(producer.framework, "observation.producer.framework")
+				try nonempty(producer.captureMethod, "observation.producer.capture_method")
+			}
 			if let runID = observation.runID {
 				try reference(runID, in: runs, name: "observation.run_id")
 			}
@@ -156,6 +163,7 @@ public enum PyxisValidation {
 		}
 
 		for transition in document.transitions {
+			if let key = transition.key { try nonempty(key, "transition.key") }
 			try reference(
 				transition.observationID,
 				in: observations,

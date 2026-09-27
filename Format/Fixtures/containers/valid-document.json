@@ -1,0 +1,14 @@
+{
+  "format": "pyxis.document",
+  "version": 1,
+  "id": "document",
+  "title": "App",
+  "recordings": [],
+  "pages": [
+    {
+      "id": "empty-page",
+      "title": "Empty page",
+      "recording_ids": []
+    }
+  ]
+}

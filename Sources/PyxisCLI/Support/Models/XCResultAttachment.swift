@@ -4,19 +4,22 @@ internal struct XCResultAttachment: Decodable {
 	internal var configurationName: String
 	internal var deviceID: String
 	internal var repetitionNumber: Int?
+	internal var arguments: [String]?
 
 	internal init(
 		exportedFileName: String,
 		suggestedHumanReadableName: String,
 		configurationName: String,
 		deviceID: String,
-		repetitionNumber: Int?
+		repetitionNumber: Int?,
+		arguments: [String]? = nil
 	) {
 		self.exportedFileName = exportedFileName
 		self.suggestedHumanReadableName = suggestedHumanReadableName
 		self.configurationName = configurationName
 		self.deviceID = deviceID
 		self.repetitionNumber = repetitionNumber
+		self.arguments = arguments
 	}
 
 	private enum CodingKeys: String, CodingKey {
@@ -25,5 +28,6 @@ internal struct XCResultAttachment: Decodable {
 		case configurationName
 		case deviceID = "deviceId"
 		case repetitionNumber
+		case arguments
 	}
 }

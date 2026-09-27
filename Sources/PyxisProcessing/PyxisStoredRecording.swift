@@ -1,10 +1,11 @@
 public struct PyxisStoredRecording: Sendable {
 	public let id: String
-	public let bundle: PyxisBundleInput
+	/// Original variation records. Each retains its own state declarations, profiles and provenance.
+	public let recordings: [PyxisBundleInput]
 
 	@inlinable
-	public init(id: String, bundle: PyxisBundleInput) {
+	public init(id: String, recordings: [PyxisBundleInput]) {
 		self.id = id
-		self.bundle = bundle
+		self.recordings = recordings
 	}
 }

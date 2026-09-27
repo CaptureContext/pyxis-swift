@@ -1,4 +1,5 @@
-import ExampleTesting
+import PyxisCore
+import PyxisModel
 
 extension PyxisDomain {
 	internal static let notes: Self = .init(id: "notes", title: "Notes", order: 0)

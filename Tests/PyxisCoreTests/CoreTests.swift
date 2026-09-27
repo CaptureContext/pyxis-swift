@@ -11,7 +11,7 @@ struct PyxisCoreTests {
 
 	@Test
 	func formatFixtures() async throws {
-		for name in ["valid-map", "valid-fragment"] {
+		for name in ["valid-map", "valid-fragment", "valid-producer"] {
 			let root = fixtures.appendingPathComponent(name)
 			let document = try PyxisJSON.decode(Data(contentsOf: root.appendingPathComponent("manifest.json")))
 			try BundleValidator.validate(document: document, root: root)

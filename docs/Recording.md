@@ -88,7 +88,7 @@ The runner only boots devices needed by the selected configurations and only exe
 
 ## Options
 
-- `version`, `xcode`, `devices`, `variants` and `output` are required. Provide exactly one `xcode.project` or `xcode.workspace`, a scheme, and a nonempty `only_testing` list of XCTest selectors.
+- `version`, `xcode`, `devices`, `variants` and `output` are required. Provide exactly one `xcode.project` or `xcode.workspace`, a scheme, and a nonempty `only_testing` list of Xcode test selectors (XCTest or Swift Testing).
 - Device `name` is the profile's readable label. Optional `simulator` supplies the installed device-type name or identifier when it differs. Otherwise `name` is used for resolution. Names must be unique. Pyxis chooses the newest installed compatible iOS runtime, or the requested version/identifier. Missing selected required devices fail before building. Skipped optional devices appear in `plan.json`.
 - `build_arguments` and `test_arguments` are literal `xcodebuild` arguments. There is no shell interpolation. Pyxis owns destinations, result paths, test selectors and test configurations. Generate your Xcode project first when your app requires it.
 - `environment` sets app-owned test-runner variables. Forward values to `app.launchEnvironment` in tests when the app needs them. `PYXIS_` names are reserved.
@@ -110,7 +110,7 @@ Every test configuration receives these values in `ProcessInfo.processInfo.envir
 | `PYXIS_DEVICE_NAME` | The configured device label |
 | `PYXIS_DEVICE_MODEL` | Resolved hardware identifier for diagnostics or verification |
 
-`PyxisRecordingEnvironment` decodes and validates this contract. It lives in `PyxisCore` so the CLI and XCTest use the same implementation, and `PyxisXCTest` re-exports it. Missing values remain `nil` for manual-run defaults; malformed supplied values throw. `encoded()` emits only the Pyxis-owned fields. Pass its values to your profile and run metadata:
+`PyxisRecordingEnvironment` decodes and validates this contract. It lives in `PyxisCore` so the CLI and both test adapters use the same implementation; `PyxisXCTest` and `PyxisTesting` re-export it. Missing values remain `nil` for manual-run defaults; malformed supplied values throw. `encoded()` emits only the Pyxis-owned fields. Pass its values to your profile and run metadata:
 
 ```swift
 import Foundation
@@ -134,13 +134,13 @@ let profile: PyxisProfile = try .init(
 )
 ```
 
-The sorted JSON object supplies a stable profile ID without delimiter ambiguity. [ExampleProfile](../Example/UITests/Support/ExampleProfile.swift) uses PyxisModel color-scheme, layout-direction and font-size types. [Its recording extension](../Example/UITests/Support/ExampleProfile+Recording.swift) decodes the runner environment and supplies defaults for ordinary Xcode runs. [The recording configuration extension](../Example/UITests/Support/PyxisRecordingConfiguration+Example.swift) supplies shared project, domain and run metadata.
+The sorted JSON object supplies a stable profile ID without delimiter ambiguity. [ExampleProfile](../Example/MapTestSupport/ExampleProfile.swift) uses PyxisModel color-scheme, layout-direction and font-size types. [Its recording extension](../Example/MapTestSupport/ExampleProfile+Recording.swift) decodes the runner environment and supplies defaults for ordinary Xcode runs. [The recording configuration extension](../Example/UITests/Support/PyxisRecordingConfiguration+Example.swift) supplies shared project, domain and run metadata.
 
 Pyxis passes requested variants to the app during recorder launch. Your bootstrap adapters should report what was actually applied or observed. In particular, a device adapter should verify the actual simulator and translate it to the same readable label. Returning the requested label without verification can conceal an incorrect recording.
 
 ## Output and failures
 
-Each invocation creates `<output>/<run-id>/` for results and diagnostics. Unless `archive: false`, it also creates `recording.pyx` for the viewer. When `storage` is configured, a successful run updates that store and the archive exports the resulting complete context, including retained recordings. The directory also contains:
+Each invocation creates `<output>/<run-id>/` for results and diagnostics. Unless `archive: false`, it also creates `recording.pyx` for the viewer. `recording.pyx` contains only this invocation. A configured store changes only with `--update-store`; export its complete context separately. The directory also contains:
 
 - `bundle/`, the merged recording with optimized images.
 - `plan.json`, the resolved devices, ordered selections and skipped optional devices.
@@ -163,10 +163,19 @@ storage:
 archive: false
 ```
 
-`storage` is optional. Its path can be absolute or relative to the YAML file. `context` defaults to `default`; `policy` defaults to `merge`. `archive` defaults to true. With `archive: false`, record updates the store without packaging its assets. Export a regular `.pyx` later with `pyxis store export`.
+`storage` is optional. Its path can be absolute or relative to the YAML file. `context` defaults to `default`; `policy` defaults to `merge`. `archive` defaults to true. With `archive: false`, record skips its per-run ZIP. `--update-store` is still required to update storage. Export a nested `.pyx` later with `pyxis store export`.
 
-Only runs whose tests and configured coverage checks succeed advance the store. Failed runs leave the last successful store snapshot unchanged and retain per-run diagnostics and any exported captures. `storage-result.json` records the updated context and snapshot ID. Store publication can succeed even if subsequent archive export fails; retry export without rerecording.
+Only explicitly requested updates whose native tests, selected configurations and output integrity checks succeed advance the store. Failed runs leave the last successful store snapshot unchanged and retain per-run diagnostics and any exported captures. `storage-result.json` records the updated context and snapshot ID. Per-run publication happens before the store head advances.
 
-Coverage is evaluated against this invocation's selected variants. When selecting only some tests, configure `coverage.states` for the states those tests are intended to capture. A successful partial selection replaces the matching journey/test/requested-variant scopes; unselected scopes survive `merge`.
+`coverage.states` is deprecated and ignored with a warning. Test assertions own the expected checkpoints. Pyxis validates passed recording outcomes, requested/observed configurations, and artifact integrity. It does not infer full-app coverage from a list of state names.
+
+```sh
+swift run pyxis record --config Example/pyxis.yaml \
+  --only-testing PyxisExampleSnapshotTests/ExampleSnapshots \
+  --variant color_scheme=dark --variant layout_direction=ltr
+# Add --update-store only when this selection should replace shared variations.
+```
+
+Repeated `--only-testing` options override `xcode.only_testing`; repeated `--variant key=value` constraints filter the configured matrix. A successful selection wholly replaces its authored contribution/configuration slots. Unselected variations survive with their old provenance.
 
 Choose an explicit context when branches should be isolated; Pyxis does not inspect Git or decide when old recordings are stale. Retained captures carry their original run provenance. The complete storage guide is [Storage.md](Storage.md).

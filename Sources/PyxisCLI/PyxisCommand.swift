@@ -9,6 +9,8 @@ internal struct PyxisCommand: AsyncParsableCommand {
 		subcommands: [
 			ValidateCommand.self,
 			PackCommand.self,
+			ComposeCommand.self,
+			MigrateCommand.self,
 			StoreCommand.self,
 			MergeCommand.self,
 			OptimizeCommand.self,

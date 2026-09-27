@@ -4,7 +4,7 @@ import Foundation
 internal struct CaptureCommand: AsyncParsableCommand {
 	internal static let configuration: CommandConfiguration = .init(
 		commandName: "capture",
-		abstract: "Run authored UI tests and export their captured map.",
+		abstract: "Run authored tests and export their captured map.",
 		discussion: """
 		Retains xcresult and logs on failure and attempts partial export. A failed
 		test run exits nonzero even if a partial bundle was published. Existing
@@ -27,7 +27,7 @@ internal struct CaptureCommand: AsyncParsableCommand {
 
 	@Option(
 		name: .long,
-		help: "Xcode scheme containing the authored UI tests."
+		help: "Xcode scheme containing the authored recording tests."
 	)
 	internal var scheme: String
 
@@ -51,7 +51,7 @@ internal struct CaptureCommand: AsyncParsableCommand {
 
 	@Option(
 		name: .long,
-		help: "Run one XCTest selector, such as Target/TestClass/testMethod."
+		help: "Run one Xcode test selector, such as Target/TestSuite/testMethod."
 	)
 	internal var onlyTesting: String?
 

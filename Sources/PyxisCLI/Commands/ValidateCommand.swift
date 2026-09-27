@@ -20,8 +20,9 @@ internal struct ValidateCommand: ParsableCommand {
 	internal func run() throws {
 		let session: BundleInputSession = try .init(paths: [path])
 		defer { withExtendedLifetime(session) {} }
-		let bundle: PyxisBundleInput = session.inputs[0]
-		try BundleValidator.validate(document: bundle.document, root: bundle.root)
-		print("Valid \(bundle.document.format.rawValue): \(bundle.document.captures.count) captures")
+		for bundle in session.inputs {
+			try BundleValidator.validate(document: bundle.document, root: bundle.root)
+		}
+		print("Valid: \(session.inputs.count) recordings, \(session.inputs.reduce(0) { $0 + $1.document.captures.count }) captures")
 	}
 }

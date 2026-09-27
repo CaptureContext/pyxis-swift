@@ -106,8 +106,9 @@ internal final class BundlePublication {
 	internal func commit() throws -> PyxisMapDocument {
 		let merged: PyxisMapDocument = try MapMerger.merge(documents)
 		try PyxisValidation.validate(merged)
-		try PyxisArtifact().encoded().write(to: stage.appendingPathComponent("artifact.json"), options: .atomic)
 		let manifest: Data = try PyxisJSON.encode(merged)
+		try PyxisArtifact(id: StableID.sha256(manifest)).encoded()
+			.write(to: stage.appendingPathComponent("artifact.json"), options: .atomic)
 
 		try manifest.write(
 			to: stage.appendingPathComponent("manifest.json"),

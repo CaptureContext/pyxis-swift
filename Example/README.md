@@ -25,7 +25,7 @@ swift package --disable-sandbox --allow-writing-to-package-directory \
   pyxis record --config Example/pyxis.yaml
 ```
 
-The Swift runner reads [pyxis.yaml](pyxis.yaml) and creates an isolated simulator for each device, builds once, runs all eight UI combinations on each device, and exports one combined `recording.pyx` under `.generated/recordings/<run-id>/`. It deletes its simulators afterward. It does not use or alter an existing personal simulator.
+The Swift runner reads [pyxis.yaml](pyxis.yaml) and creates an isolated simulator for each device, builds once, runs UI journeys and Swift Testing snapshots for all eight combinations on each device, and exports one combined `recording.pyx` under `.generated/recordings/<run-id>/`. It deletes its simulators afterward. It does not use or alter an existing personal simulator.
 
 | Dimension | Values |
 | --- | --- |
@@ -72,7 +72,7 @@ ffmpeg resizes each screenshot without changing its aspect ratio or enlarging sm
 
 The recording configuration uses `screenshotSource: .screen` to include the software keyboard. The keyboard state also waits until the keyboard is hittable; an app-only screenshot can omit this separate system window.
 
-The original full-resolution XCTest attachments remain in each device's `Tests.xcresult`; only the published images are reduced. Device bundles are merged without recompressing them. Import the single `recording.pyx` into the [Pyxis viewer](https://pyxis.capturecontext.dev).
+The original full-resolution native test attachments remain in each device's `Tests.xcresult`; only the published images are reduced. Device bundles are merged without recompressing them. Import the single `recording.pyx` into the [Pyxis viewer](https://pyxis.capturecontext.dev).
 
 To publish an existing recording with the same settings:
 
@@ -107,7 +107,7 @@ The app uses literal accessibility identifiers such as `"open.detail"`. UI tests
 
 Open `PyxisExample.xcworkspace`. It contains the Xcode project and the local package in this directory. XcodeGen marks that package `excludeFromProject`; package resolution belongs to the workspace. The Xcode project contains only app/scene delegate entry shims, bundle metadata and tests.
 
-`Package.swift` owns the dependency on the parent Pyxis checkout. [ExampleApp](Sources/ExampleApp/README.md) contains all application implementation. [ExampleTesting](Sources/ExampleTesting/README.md) only re-exports the test dependencies and is linked solely into UI tests. There is no shared-source folder and the app never links XCTest.
+`Package.swift` owns the dependency on the parent Pyxis checkout. [ExampleApp](Sources/ExampleApp/README.md) contains all application implementation. [ExampleTesting](Sources/ExampleTesting/README.md) only re-exports the test dependencies and is linked solely into UI tests. `ExampleSnapshotTesting` re-exports `PyxisTesting` for the unit-test bundle. `MapTestSupport` holds shared state, domain and profile declarations. The app never links a testing adapter.
 
 Run `make -C Example project` after changing `project.yml`. The project and workspace are checked in, and the Make target regenerates both deterministically.
 
@@ -120,8 +120,8 @@ Run `make -C Example project` after changing `project.yml`. The project and work
 - `UITests/MatrixUITests.swift` adds async recording to an ordinary `XCTestCase` across two journeys, repeated by Xcode for each configured profile.
 - `UITests/AsyncDemoUITests.swift` demonstrates dedicated recording through `PyxisTestCase` and its launch hooks.
 - `UITests/DemoUITests.swift` retains synchronous recording and failure examples.
-- `UITests/Support/` owns the test profiles, identifiers, journeys and fixtures. `PyxisRecordingEnvironment`, re-exported by `PyxisXCTest`, decodes CLI values and supplies typed dates, profile order and variants.
-- `UITests/Support/` extends `PyxisState`, `PyxisDomain`, `PyxisRecordingConfiguration` and `PyxisRecorder` with app-owned declarations and helpers. Calls read `recorder.capture(.home)` and `recorder.transition(from: .editorEmpty, to: .editorKeyboard, ...)`.
+- `MapTestSupport/` owns shared profiles, state IDs and domain declarations. `UITests/Support/` owns UI navigation and recorder helpers. `PyxisRecordingEnvironment`, re-exported by `PyxisXCTest`, decodes CLI values and supplies typed dates, profile order and variants.
+- The test support extends `PyxisState`, `PyxisDomain`, `PyxisRecordingConfiguration` and `PyxisRecorder` with app-owned declarations and helpers. Calls read `recorder.capture(.home)` and `recorder.transition(from: .editorEmpty, to: .editorKeyboard, ...)`.
 
 The runner supplies `PYXIS_VARIANTS`, `PYXIS_PROFILE_ORDER`, shared run metadata and resolved device details to the tests. One run ID and creation date are shared across all devices. Manual Xcode runs use fixed demonstration metadata; use the runner for a fresh, shareable execution. The scene manifest supports multiple windows, and report transport stays window-specific.
 
@@ -148,3 +148,35 @@ TEST_RUNNER_EXAMPLE_VERIFY_ASSERTION_FAILURE=1 swift run pyxis capture \
 The command must fail while retaining a valid partial recording. For the uncaught async-error check, use `TEST_RUNNER_EXAMPLE_VERIFY_ASYNC_FAILURE=1` and select `PyxisExampleUITests/AsyncDemoUITests/testAsyncThrownFailure`.
 
 For a simulator-free synthetic recording, run `swift run pyxis demo --output .generated/demo`. Those drawn images are separate from this SwiftUI app.
+
+## Swift Testing snapshots and mixed maps
+
+`SnapshotTests/ExampleSnapshots.swift` renders the real SwiftUI views with synthetic note data using `PyxisTesting` and SnapshotTesting. The parameterized notebook test has separate recording keys for empty and populated fixtures. Note detail shares its state ID with the UI journey and adds `detail_long`, which has no invented navigation edge.
+
+The default `pyxis.yaml` records both producers. To update only snapshot states, use:
+
+```sh
+swift run pyxis record --config Example/pyxis-snapshots.yaml
+```
+
+Both configurations use the same store/context. A snapshot-only run retains UI journeys already in that store; in a new store it produces a snapshot-only map. `journey.*` and `states.*` recording keys identify independent contributions. To deliberately replace a UI contribution with snapshots, use its same recording key and requested conditions. Reusing a state ID alone does not replace the UI recording.
+
+Snapshot fixtures explicitly apply appearance, layout direction and Dynamic Type in the hosting view. They use the selected simulator's bounds and a fixed trial fixture; they do not launch a second application. The UI journey still records actual navigation, modal presentation and the software keyboard.
+
+Raw image/fragment/completion attachments stay in `Tests.xcresult`; exports use `bundle/assets`, and store assets/snapshots/heads use the existing storage layout. Native test outcomes are checked during export, so a nonthrowing failed expectation cannot enter the passed store. Baseline comparisons are optional and are not enabled in this capture-only Example. See [the integration contract](../docs/SnapshotRecording.md).
+
+The snapshot adapter has simulator tests for timeout, cancellation, repeated callbacks, transitions and baseline failures in `SnapshotAdapterTests`. To verify final native failure reconciliation, opt in to `RecordingFailureProbe` with `TEST_RUNNER_PYXIS_VERIFY_NATIVE_FAILURE=1` and select only `PyxisExampleSnapshotTests/RecordingFailureProbe`. Its three parameter cases intentionally fail an expectation before, inside and after recording. Use Xcode's `-collect-test-diagnostics never` for this synthetic probe to avoid collecting an unnecessary sysdiagnose. The resulting export must contain failed observations, and `store update` must reject it.
+
+`ExampleApp` is an explicit static product so hosted tests reuse its runtime implementation. The runtime test target links the common Core/Model products directly because Xcode may factor those shared modules into frameworks when both recording adapters are present. This avoids separate copies of Pyxis's scoped configuration storage in the host and tests.
+
+## Review a partial recording
+
+```sh
+# From pyxis-swift. Use the primary YAML with an ordinary native test selector.
+swift run pyxis record --config Example/pyxis.yaml \
+  --only-testing PyxisExampleSnapshotTests/ExampleSnapshots \
+  --variant color_scheme=dark --variant layout_direction=ltr \
+  --variant accessibility.content_size=large
+```
+
+The run writes a new `recording.pyx` under the YAML output directory, without changing shared storage. Drop it into the frontend to create a page. Select content, use Cmd+K → Use as diff source, then select another page/configuration and invoke Diff. Add `--update-store` only to replace these complete variations in the configured store. Existing version 1 stores need explicit migration to a new directory first. `pyxis-snapshots.yaml` is an optional example preset for the same runner, not a separate snapshot configuration format.

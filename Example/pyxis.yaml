@@ -4,6 +4,7 @@ xcode:
   scheme: PyxisExample
   only_testing:
     - PyxisExampleUITests/MatrixUITests
+    - PyxisExampleSnapshotTests/ExampleSnapshots
   build_arguments:
     - CODE_SIGNING_ALLOWED=NO
     - -skipMacroValidation
@@ -30,5 +31,3 @@ derived_data: ../.generated/ExampleDerivedData
 images:
   width: 240
   jpeg_quality: 0.5
-coverage:
-  states: [home, detail, notebooks, notebooks_empty, editor_empty, editor_keyboard, settings, subscription]

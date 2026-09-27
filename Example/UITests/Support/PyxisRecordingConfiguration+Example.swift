@@ -13,12 +13,13 @@ extension PyxisRecordingConfiguration {
 			run: .init(
 				id: environment.runID ?? "example-local-v3",
 				createdAt: environment.runCreatedAt ?? Date(timeIntervalSince1970: 1789344000),
-				provenance: ["fixture": "swiftui-notes-v3", "screenshot_source": "screen"]
+				provenance: ["fixture": "swiftui-notes-v3"]
 			),
 			domains: [.notes, .settings],
 			profile: profile.recording,
 			journeyID: journey.rawValue,
 			title: journey.title,
+			recordingKey: "journey.\(journey.rawValue)",
 			screenshotSource: .screen
 		)
 	}

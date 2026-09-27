@@ -1,4 +1,4 @@
-# Pyxis format 1
+# Pyxis recording and document formats
 
 This is the implementation contract for the first independent Pyxis release. It is a new format, with no implicit compatibility with Myo schema 1/2. Do not reuse Myo's canonical JSON identity assumptions.
 
@@ -32,6 +32,8 @@ interface Observation {
   status: "passed" | "failed" | "incomplete";
   variants: Record<string,VariantResult>;
   started_at?: string; failure?: string; run_id?: string;
+  recording_key?: string;
+  producer?: { framework: string; capture_method: string };
 }
 interface Capture {
   id: string; state_id: string; observation_id: string; sequence: number;
@@ -79,13 +81,13 @@ Bootstrap parses an explicit launch payload only when opted in by the app. It su
 
 ## Assets and transport
 
-A published bundle contains `artifact.json`, `manifest.json`, and `assets/...` files. A regular `.pyx` is a ZIP of that directory with metadata at its root. The browser imports one regular `.pyx` at a time, from a selected file, a drop, or an explicit archive URL. Folder and raw ZIP inputs remain available to publication tools. Raw recordings may omit `artifact.json`; a regular `.pyx` must include it. The artifact descriptor and manifest have independent version numbers. Paths use ASCII-safe relative POSIX segments (`[A-Za-z0-9._-]+`), reject empty, dot, dot-dot, backslash, absolute paths, schemes, query, fragments and percent encodings. Never fetch a manifest asset URL from the network. Resolve files beneath bundle root, including symlink containment on disk. Duplicate ZIP entries and inconsistent asset descriptors are errors. Do not render SVG/HTML supplied as images. Verify asset SHA-256 and file type before displaying; errors must preserve the previous valid map.
+A published bundle contains `artifact.json`, `manifest.json`, and `assets/...` files. A regular `.pyx` is a ZIP of that directory with metadata at its root. The browser opens `.pyx` recordings as new pages and imports portable `.pyxis` documents from selected files, drops, or an explicit archive URL. Folder and raw ZIP inputs remain available to publication tools. Raw recordings may omit `artifact.json`; a regular `.pyx` must include it. The artifact descriptor and manifest have independent version numbers. Paths use ASCII-safe relative POSIX segments (`[A-Za-z0-9._-]+`), reject empty, dot, dot-dot, backslash, absolute paths, schemes, query, fragments and percent encodings. Never fetch a manifest asset URL from the network. Resolve files beneath bundle root, including symlink containment on disk. Duplicate ZIP entries and inconsistent asset descriptors are errors. Do not render SVG/HTML supplied as images. Verify asset SHA-256 and file type before displaying; errors must preserve the previous valid map.
 
 ## Identity and processing
 
 Core merge and publication run in the local Swift CLI. The browser validates the same contract, projects a graph, and computes optional image comparisons on demand; it does not duplicate XCTest merging. Export retains repeated captures even with identical pixels.
 
-Public stable-ID helper: SHA-256 of concatenated UTF-8 parts framed as ASCII decimal byte length + ':' + raw bytes, with no separator after bytes. Include a domain tag as the first part. For an observation use `observation, projectID, runID, journey_id, test_name, profile_id, attempt`; for capture `capture, observation_id, state_id, occurrence`; for transition `transition, observation_id, sequence`. Prefix outputs `o_`, `c_`, `t_`. Numeric components use plain base-10. No Unicode normalization. This is a Pyxis identity contract, not Myo compatibility. Run IDs are producer-owned; reproducibility means traceable conditions, not identical runs across different environments.
+Public stable-ID helper: SHA-256 of concatenated UTF-8 parts framed as ASCII decimal byte length + ':' + raw bytes, with no separator after bytes. Include a domain tag as the first part. The deterministic observation helper uses `observation, projectID, runID, journey_id, test_name, profile_id, attempt`; for capture `capture, observation_id, state_id, occurrence`; for transition `transition, observation_id, sequence`. Prefix outputs `o_`, `c_`, `t_`. Numeric components use plain base-10. No Unicode normalization. This is a Pyxis identity contract, not Myo compatibility. Run IDs are producer-owned; reproducibility means traceable conditions, not identical runs across different environments. The recording adapters use the same framing with `execution, projectID, runID, recording_key ?? journey_id, test_name, profile_id, execution_id` for observations. Each session generates a UUID execution ID (XCTest also includes its configured attempt), so retries, parameter cases and multiple blocks cannot overwrite each other. These opaque observation IDs are independent of replacement keys.
 
 Publication validates all inputs/assets first, writes a sibling staging directory, then replaces the target with rollback on failure. Do not delete the last valid map before validation. Full run provenance can include toolchain, SDK, simulator/runtime, source revision, fixture version and capture profile source; do not collect secrets/environment dumps.
 
@@ -98,12 +100,59 @@ Package Format contains JSON Schema and tiny synthetic valid/invalid fixtures. F
 Profile `order` is an optional nonnegative integer, defaulting to 0. Viewers select the lowest ordered profile initially; ties preserve document order. Recorders can preserve the first configuration as the default even when publication sorts profiles by ID.
 
 
-## Regular artifact envelope
+## Recording and visualization envelopes
 
-A `.pyx` is a flat ZIP with `artifact.json`, `manifest.json`, and the manifest's referenced `assets/` files. The descriptor is `{ "format": "pyxis.artifact", "version": 1, "type": "regular" }`, governed independently by `artifact-1.schema.json`. All fields are required; unknown fields are ignored, while unknown versions/types and duplicate keys are rejected. A named `.pyx` requires both metadata files at its root. Metadata entries are written before image entries. Nested archives and thin artifacts are unsupported.
+Container versions are independent of the evidence manifest. New recording writers use `pyxis.artifact` version 2; map and fragment records remain version 1. Legacy `artifact-1.schema.json` and its fixtures are frozen for explicit migration only.
 
-Regular bundle folders contain the same files. Readers can still consume bare manifests/folders and ZIP recordings without an envelope as input to publication. A present envelope is always validated. Every regular artifact is self-contained; asset paths never reference external stores or URLs. Extraction validates relative paths, duplicate entries, symlinks, referenced assets, byte checksums and image dimensions. Pyxis imposes no fixed byte-size, entry-count or image-pixel caps on recordings. Readers still validate structure and integrity; available resources and platform capabilities determine what can be processed.
+A regular leaf `.pyx` is a ZIP with `artifact.json`, `manifest.json`, and referenced images. Its descriptor is `{ "format": "pyxis.artifact", "version": 2, "type": "regular", "id": "immutable-recording-id" }`. A composition has `type: "composition"` and a nonempty `recordings` array instead of a manifest. Each reference contains `id`, `path` under `assets/` ending in `.pyx`, and the lowercase SHA-256 of the complete child ZIP. These are physical archives, not virtual directories. Extracting any child produces an independently usable recording.
+
+```text
+recording.pyx                         # ZIP, immutable recording ID
+├── artifact.json                    # composition, references test archives
+└── assets/recording-0.pyx            # ZIP, test contribution
+    ├── artifact.json                # composition, references variations
+    └── assets/recording-0.pyx        # ZIP, complete test/configuration variation
+        ├── artifact.json            # regular, immutable variation ID
+        ├── manifest.json            # map v1, original run/capture identities
+        └── assets/<sha256>.png       # all images needed by this variation
+```
+
+Compositions may contain other compositions. Reference IDs and child descriptors must agree. A repeated immutable ID must refer to identical archive bytes; conflicting contents, missing children, bad hashes, duplicate paths, unsafe paths and symlinks are errors. IDs are opaque; filenames do not establish semantic identity. The Swift writer uses deterministic ZIP entry timestamps and content-derived IDs. Other writers may use fresh UUIDs. New subsets/compositions need new IDs; copying archive bytes preserves identity. Do not rewrite an existing archive under its old ID.
+
+`.pyxis` is a ZIP with `document.json` and all `.pyx` recordings referenced by its pages:
+
+```text
+app.pyxis
+├── document.json                    # pyxis.document v1; persistent ID/title/pages
+└── assets/recording-0.pyx            # original embedded recording, including children
+```
+
+The document has `format`, `version`, `id`, `title`, `recordings`, and `pages`. Each page has a persistent `id`, `title`, and unique `recording_ids` resolved against the document's embedded recordings. Multiple pages may share a recording. An ordinary page can combine recordings from different runs and configurations. Empty pages/documents are valid. A page is not an app version. Temporary comparisons, selection, grouping, camera position and comparison controls are viewer state and are not serialized in 0.1.0. Recording archives contain no layout.
+
+Readers validate relative paths, duplicate keys/entries, references, ZIP CRCs, asset checksums and decoded image dimensions. Image verification may be lazy before display; explicit migration verifies every image. There are no fixed byte-size, entry-count or image-pixel caps. Available resources and platform capabilities determine what can be processed. Imported assets never resolve over the network or execute code.
+
+## Canvas identity and comparison
+
+`(project.id, state.id)` identifies a logical state. Composition retains source state labels, captures, profiles, native test origins, run IDs and provenance; it does not rewrite old evidence using newer labels. Repeated references to the same `(project.id, run.id, capture.id)` do not invent another execution. Distinct capture IDs survive even when their pixels match.
+
+A transition may supply a nonempty stable `key`, independent of its execution `id`. Diff matches keyed connections by application/key and unkeyed connections only when endpoints are unambiguous. Parallel edges can be paired explicitly in the viewer. Diff uses selected presentation graphs and captures, ignoring domain grouping and layout. Added/removed describes those chosen inputs only. Optional app version belongs in run provenance (`app_version`); recording date is a display fallback, never an identity.
+
+## Migration and store boundaries
+
+Browser drops, file imports and archive URLs prompt before converting artifact v1 to a new in-memory recording. Cancellation and validation failure preserve existing pages and the original archive. CLI users invoke `pyxis migrate old.pyx --output new.pyx`. Existing browser-saved maps migrate explicitly into a separate document database; originals remain available. Store v1 requires `pyxis store migrate old-store --output new-store`; old revisions retain their bytes/IDs in the new store and the original directory is preserved.
+
+A store update consumes complete passed test/configuration contributions. It has no screen/state trimming option. A review selection or arbitrary manually trimmed manifest is not evidence of a whole variation and must not be submitted as its replacement. Use a separately authored recording key for independently replaceable fixture subsets. Store v2 keeps variation manifests independently and shares content-addressed assets; export restores physical nested archives. An entire multi-input update advances one head only after every input validates.
 
 ## Retained recording provenance
 
 `recording_runs` is an optional array of run metadata using the same shape as `run`; it defaults to empty. `observation.run_id` optionally selects the original run. If omitted, that observation belongs to the top-level `run`. Run IDs must be unique across both locations and every explicit reference must resolve. Explicit null is invalid. The top-level run identifies the latest update of a combined recording; retained observations keep their original run identity, timestamp and provenance. Storage composition populates these fields without changing capture/observation identities. A reader must use an observation's resolved recording run when displaying its provenance.
+
+## Recording ownership and producer provenance
+
+The optional `recording_key` is a nonempty, consumer-owned contribution ID. When present, store merge replacement uses `(recording_key, requested profile values)` within one project/context. Test names, journey names, profile IDs and producer metadata do not participate in that scope. Different keys coexist, even when they capture the same state. Reuse a key deliberately to change its producer. Parameterized fixtures should include their stable case identity in the key when they are independently replaceable.
+
+An observation without a key keeps the existing `(journey_id, test_name, requested values)` replacement rule. That namespace is disjoint from explicit keys. These optional fields are additive format-1 fields; absence remains valid and explicit null is invalid. Use updated producers and CLI together when relying on key-based replacement.
+
+`producer` contains nonempty `framework` and `capture_method` strings. Current adapters emit `xctest` with `application` or `screen`, and `swift_testing` with `snapshot_testing`. These are provenance, never UI variants. All executions receive separate observation IDs; state IDs remain project-wide semantic identities. A store merge preserves each retained variation's state/domain declarations even when newer variations use different labels. One incoming update cannot assign the same key and requested conditions to different test/journey/producer owners; repeated executions of one owner remain distinct observations.
+
+Swift Testing fragments remain incomplete until xcresult export finds their completion attachment and verifies the native test outcome. A failed native test stays failed, including nonthrowing expectation failures. Missing, skipped, unknown or ambiguous successful outcomes remain incomplete. A test with a failed retry is conservatively rejected as a whole; the exporter does not guess which parameter/retry owns an aggregate pass. Final passed observations alone may update a recording store.

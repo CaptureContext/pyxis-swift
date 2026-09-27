@@ -1,4 +1,5 @@
-import ExampleTesting
+import PyxisCore
+import PyxisModel
 
 internal struct ExampleProfile: Equatable, Sendable {
 	internal typealias ColorScheme = PyxisVariantEntry.ColorScheme

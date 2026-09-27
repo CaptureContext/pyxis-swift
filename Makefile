@@ -2,9 +2,9 @@ output ?= .agents/interfaces
 platform ?= macos
 swift_sdk ?=
 
-# The executable and its command plugin are macOS-only. iOS exposes the five libraries.
+# The executable and its command plugin are macOS-only. iOS exposes the seven libraries.
 ifeq ($(platform),ios)
-interface_targets = --target PyxisCore --target PyxisModel --target PyxisProcessing --target PyxisRuntime --target PyxisXCTest
+interface_targets = --target PyxisCore --target PyxisModel --target PyxisProcessing --target PyxisRuntime --target PyxisXCTest --target PyxisRecording --target PyxisTesting
 endif
 
 .PHONY: swiftinterface test

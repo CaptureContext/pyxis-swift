@@ -35,18 +35,13 @@ internal struct StoreUpdateCommand: ParsableCommand {
 			// A normalized input is disposable; preserve any original store error.
 			try? FileManager.default.removeItem(at: staging)
 		}
-		var input: PyxisBundleInput = session.inputs[0]
-		let canonical: Bool = input.document.captures.allSatisfy { capture in
-			guard let hash = capture.asset.sha256 else { return false }
-			return capture.asset.path == "assets/\(hash).\(capture.asset.mediaType == .png ? "png" : "jpg")"
+		var inputs: [PyxisBundleInput] = []
+		for (index, input) in session.inputs.enumerated() {
+			let destination = staging.appendingPathComponent(String(index))
+			inputs.append(try .init(document: BundlePublisher.publish(inputs: [input], to: destination), root: destination))
 		}
-		if !canonical {
-			input = try .init(document: BundlePublisher.publish(inputs: session.inputs, to: staging), root: staging)
-		}
-		let result: PyxisStoredRecording = try options.store.update(
-			input, context: options.context,
-			policy: policy
-		)
+		let result = try options.store.update(inputs, context: options.context, policy: policy)
+
 		print("Snapshot: \(result.id) [\(options.context)]")
 	}
 }

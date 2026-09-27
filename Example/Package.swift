@@ -7,7 +7,13 @@ let package = Package(
 	platforms: [.iOS(.v17)],
 	products: [
 		.library(
+			name: "ExampleSnapshotTesting",
+			targets: ["ExampleSnapshotTesting"]
+		),
+		.library(
 			name: "ExampleApp",
+			// Keep the app implementation in the host so hosted tests reuse its runtime.
+			type: .static,
 			targets: ["ExampleApp"]
 		),
 		.library(
@@ -19,6 +25,12 @@ let package = Package(
 		.package(path: ".."),
 	],
 	targets: [
+		.target(
+			name: "ExampleSnapshotTesting",
+			dependencies: [
+				.product(name: "PyxisTesting", package: "pyxis-swift"),
+			]
+		),
 		.target(
 			name: "ExampleApp",
 			dependencies: [

@@ -1,6 +1,7 @@
 import Foundation
 
 public struct PyxisTransition: Codable, Equatable, Sendable {
+	public var key: String?
 	public var id: String
 	public var observationID: String
 	public var fromStateID: String
@@ -21,8 +22,10 @@ public struct PyxisTransition: Codable, Equatable, Sendable {
 		kind: String,
 		sequence: Int,
 		status: PyxisTransitionStatus,
-		failure: String? = nil
+		failure: String? = nil,
+		key: String? = nil
 	) {
+		self.key = key
 		self.id = id
 		self.observationID = observationID
 		self.fromStateID = fromStateID
@@ -46,12 +49,13 @@ public struct PyxisTransition: Codable, Equatable, Sendable {
 			kind: container.decode(String.self, forKey: .kind),
 			sequence: container.decode(Int.self, forKey: .sequence),
 			status: container.decode(PyxisTransitionStatus.self, forKey: .status),
-			failure: container.contains(.failure) ? container.decode(String.self, forKey: .failure) : nil
+			failure: container.contains(.failure) ? container.decode(String.self, forKey: .failure) : nil,
+			key: container.contains(.key) ? container.decode(String.self, forKey: .key) : nil
 		)
 	}
 
 	private enum CodingKeys: String, CodingKey {
-		case id
+		case id, key
 		case observationID = "observation_id"
 		case fromStateID = "from_state_id"
 		case toStateID = "to_state_id"

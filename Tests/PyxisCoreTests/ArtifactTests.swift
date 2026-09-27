@@ -14,8 +14,8 @@ struct ArtifactTests {
 		let output: URL = workspace.root.appendingPathComponent("recording.pyx")
 		try PyxisArchive().write(input, to: output)
 		let archive: Archive = try .init(url: output, accessMode: .read)
-		expectNoDifference(Array(archive).prefix(2).map(\.path), ["artifact.json", "manifest.json"])
-		expectNoDifference(Array(archive).count, 3)
+		expectNoDifference(Array(archive).prefix(2).map(\.path), ["artifact.json", "assets/recording-0.pyx"])
+		expectNoDifference(Array(archive).count, 2)
 		let unpacked: PyxisBundleInput = try PyxisArchive().extract(from: output, to: workspace.root.appendingPathComponent("unpacked"))
 		expectNoDifference(unpacked.document, input.document)
 		#expect(throws: (any Error).self) { try PyxisArchive().write(input, to: output) }
@@ -29,7 +29,7 @@ struct ArtifactTests {
 		for file in try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil) {
 			let data: Data = try .init(contentsOf: file)
 			if file.lastPathComponent.hasPrefix("valid") {
-				expectNoDifference(try PyxisArtifact(data: data), .init())
+				expectNoDifference(try PyxisArtifact(data: data, allowLegacy: true), .init(version: 1))
 			} else {
 				#expect(throws: (any Error).self) { try PyxisArtifact(data: data) }
 			}

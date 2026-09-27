@@ -11,7 +11,8 @@ internal struct RecordingCoverageReport: Encodable {
 	internal init(
 		document: PyxisMapDocument,
 		configuration: RecordingCoverageConfiguration?,
-		plan: RecordingPlan
+		plan: RecordingPlan,
+		testSelectors: [String] = []
 	) {
 		var problems: [String] = []
 		for observation in document.observations where observation.status != .passed {
@@ -27,12 +28,9 @@ internal struct RecordingCoverageReport: Encodable {
 			}
 			let summary: String = expected.keys.sorted().map { "\($0)=\(expected[$0] ?? "")" }.joined(separator: ", ")
 			if observations.isEmpty { problems.append("Missing passed recording: \(summary)") }
-			let observationIDs: Set<String> = .init(observations.map(\.id))
-			let captured: Set<String> = .init(document.captures.filter {
-				observationIDs.contains($0.observationID)
-			}.map(\.stateID))
-			let missing: Set<String> = Set(configuration?.states ?? []).subtracting(captured)
-			if !missing.isEmpty { problems.append("Missing states [\(missing.sorted().joined(separator: ", "))]: \(summary)") }
+			for selector in testSelectors where !observations.contains(where: { Self.matches($0.testName, selector: selector) }) {
+				problems.append("Missing recording output for selected tests \(selector): \(summary)")
+			}
 			for observation in observations {
 				for (key, value) in expected {
 					let result: PyxisVariantResult? = observation.variants[key]
@@ -48,4 +46,16 @@ internal struct RecordingCoverageReport: Encodable {
 		self.problems = problems
 		self.complete = problems.isEmpty && !document.captures.isEmpty
 	}
+	private static func matches(_ name: String, selector: String) -> Bool {
+		let selection = selector.split(separator: "/").map(String.init)
+		// XCTest names omit the target; Swift Testing IDs include it. Match the authored suffix.
+		let suffix = selection.count > 1 ? Array(selection.dropFirst()) : selection
+		let normalized = name.replacingOccurrences(of: "-[", with: "").replacingOccurrences(of: "]", with: "")
+			.replacingOccurrences(of: ".", with: "/").replacingOccurrences(of: " ", with: "/")
+		let components = normalized.split(separator: "/").map { String($0.prefix { $0 != "(" }) }
+		let wanted = suffix.map { String($0.prefix { $0 != "(" }) }
+		guard !wanted.isEmpty, components.count >= wanted.count else { return false }
+		return (0...(components.count - wanted.count)).contains { index in Array(components[index..<(index + wanted.count)]) == wanted }
+	}
+
 }

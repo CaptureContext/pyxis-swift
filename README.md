@@ -2,6 +2,8 @@
 
 **Pyxis** builds a visual map of an app's screens, states and transitions. It helps developers, designers and coding agents explore large apps, discuss changes using shared screen references, and review UI variants in the [Pyxis viewer](https://pyxis.capturecontext.dev).
 
+The 0.1.0 recording workflow supports Swift Testing through `PyxisTesting` and Point-Free SnapshotTesting, alongside UI journeys through `PyxisXCTest`. Partial recordings are standalone by default; shared-store changes require `--update-store`. Physically nested `.pyx` files preserve independently extractable variations. `.pyxis` files embed recordings in ordinary visualization pages. See [composition and migration](Format/README.md#recording-and-visualization-envelopes).
+
 ## Table of contents
 
 - [Motivation](#motivation)
@@ -56,7 +58,7 @@ Pyxis keeps screenshots together with named screens, states, transitions and con
 - Profiles keep variants such as appearance and text size associated with their captures. Reports distinguish requested settings from values the app actually applied or observed.
 - The viewer lets the team explore the recorded UI and inspect variants during design and accessibility reviews.
 
-XCTest drives the app to the states you want to include. Journeys can be written specifically to build the map, or recording can be added to existing UI tests. The recorder saves screenshots and fragments as XCTest attachments, and the CLI exports them into a folder or regular `.pyx` archive for the viewer.
+XCTest drives the app to the states you want to include. Swift Testing can instead render prepared views through SnapshotTesting, or add isolated states to the same map. See [snapshot recording](docs/SnapshotRecording.md). Journeys can be written specifically to build the map, or recording can be added to existing UI tests. The recorder saves screenshots and fragments as XCTest attachments, and the CLI exports them into a folder or regular `.pyx` archive for the viewer.
 
 Your app keeps its navigation, fixtures and configuration logic. App bootstrap adapters are optional when you need to apply variants at launch. Maps can stay local or be shared with teammates and agents, without an upload backend, accounts or telemetry.
 
@@ -194,7 +196,7 @@ swift run pyxis demo --output .generated/demo
 swift run pyxis validate .generated/demo
 ```
 
-Open [the viewer](https://pyxis.capturecontext.dev) and drop the `.generated/demo` folder onto its canvas. You can also use **Library → Import folder**. No simulator is required.
+Run `swift run pyxis pack .generated/demo --output .generated/demo.pyx`, then drop that archive into the viewer. No simulator is required.
 
 For a runnable app integration, see the [iOS example](Example/README.md). It includes both existing-test and dedicated-test integrations.
 
@@ -326,7 +328,7 @@ swift run pyxis merge \
   .generated/light .generated/dark
 ```
 
-Inputs must share project and run metadata. Duplicate declarations must agree; incompatible identities produce an error. This is why run metadata should be supplied centrally before recording starts.
+For `merge`, inputs must share project and run metadata. Use `compose` to retain independent runs in a nested artifact. Duplicate declarations must agree; incompatible identities produce an error. This is why run metadata should be supplied centrally before recording starts.
 
 Publication validates each image, writes a complete staged bundle, then replaces a previous valid output. Input/output overlap is rejected. Choose your own retention and Git policy for recordings and diagnostics.
 
@@ -338,24 +340,27 @@ Publication validates each image, writes a complete staged bundle, then replaces
 | `PyxisCore` | Typed configuration, scoped overrides and bootstrap transport |
 | `PyxisRuntime` | Optional app bootstrap and UIKit window adapters |
 | `PyxisXCTest` | Recording in existing or dedicated UI tests |
+| `PyxisTesting` | Swift Testing recordings using SnapshotTesting image strategies |
+| `PyxisRecording` | Shared fragment lifecycle, IDs, capture sequences and attachment sink |
 | `PyxisProcessing` | Merge, image verification, regular archives and persistent recording stores |
 | `pyxis` / `PyxisPlugin` | Local command-line and SwiftPM tools |
 
 ## Installation
 
-Use Swift 6.2 or newer. The package declares iOS 17 and macOS 14 support. The XCTest recorder and window helpers are iOS APIs; the CLI and command plugin run on macOS. Recording and exporting XCTest results require Xcode. Resizing images requires a local ffmpeg installation; JPEG conversion alone uses Apple ImageIO.
+Use Swift 6.2 or newer. The package declares iOS 17 and macOS 14 support. The XCTest recorder, Swift Testing image recorder and window helpers are iOS APIs; the CLI and command plugin run on macOS. Recording and exporting native test results require Xcode. Resizing images requires a local ffmpeg installation; JPEG conversion alone uses Apple ImageIO.
 
 ### Basic
 
 You can add `pyxis-swift` to an Xcode project by adding it as a package dependency.
 
 1. Open your project's package dependencies and add a package.
-2. Enter [`https://github.com/capturecontext/pyxis-swift`](https://github.com/capturecontext/pyxis-swift) into the package repository URL text field and select version `0.0.1`.
+2. Enter [`https://github.com/capturecontext/pyxis-swift`](https://github.com/capturecontext/pyxis-swift) into the package repository URL text field and select the development revision until `0.1.0` is released.
 3. Choose the products you need to link to your targets:
 
 | Target | Product |
 | --- | --- |
 | UI tests | `PyxisXCTest` and `PyxisModel` |
+| Swift Testing snapshots | `PyxisTesting` (includes SnapshotTesting) |
 | App, if it needs launch-time overrides | `PyxisRuntime` |
 | Shared code that reads typed Pyxis configuration | `PyxisCore` |
 
@@ -407,7 +412,7 @@ make swiftinterface platform=macos
 make swiftinterface platform=ios
 ```
 
-Snapshots live under `.agents/interfaces/<platform>/`. macOS includes all six Swift targets; iOS includes the five libraries. Tests and plugin implementation targets are excluded. The snapshots are API references; scoped exports in source remain authoritative.
+Snapshots live under `.agents/interfaces/<platform>/`. macOS includes all eight Swift targets; iOS includes the seven libraries. Tests and plugin implementation targets are excluded. The snapshots are API references; scoped exports in source remain authoritative.
 
 The manually dispatched interface workflows can open update PRs using the automatic GitHub Actions token.
 

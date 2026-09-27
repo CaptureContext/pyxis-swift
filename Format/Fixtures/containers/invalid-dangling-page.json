@@ -1,0 +1,16 @@
+{
+  "format": "pyxis.document",
+  "version": 1,
+  "id": "document",
+  "title": "App",
+  "recordings": [],
+  "pages": [
+    {
+      "id": "page",
+      "title": "Page",
+      "recording_ids": [
+        "missing"
+      ]
+    }
+  ]
+}

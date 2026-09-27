@@ -1,0 +1,47 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)
+// swift-module-flags: -target arm64-apple-ios17.0-simulator -enable-objc-interop -language-mode 6 -O -enable-experimental-feature DebugDescriptionMacro -module-name PyxisRecording -package-name pyxis_swift
+// swift-module-flags-ignorable:  -formal-cxx-interoperability-mode=off -interface-compiler-version 6.4
+import Foundation
+import PyxisCore
+import PyxisModel
+import Swift
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+public enum PyxisRecordingError : Swift::Error, Swift::Sendable {
+  case alreadyFinished
+  case sourceNotCaptured(Swift::String)
+  case conflictingState(Swift::String)
+  case unknownTransition
+  case invalidImage
+}
+@_Concurrency::MainActor final public class PyxisRecordingSession {
+  @_hasStorage @_Concurrency::MainActor final public var document: PyxisModel::PyxisMapDocument {
+    get
+  }
+  @_hasStorage @_Concurrency::MainActor @_hasInitialValue final public var isFinished: Swift::Bool {
+    get
+  }
+  @_Concurrency::MainActor @_hasInitialValue final private var sequence: Swift::Int
+  @_Concurrency::MainActor @_hasInitialValue final private var revision: Swift::Int
+  @_Concurrency::MainActor final private let attach: @_Concurrency::MainActor @Sendable (Foundation::Data, Swift::String) throws -> Swift::Void
+  @_Concurrency::MainActor public init(configuration: PyxisRecording::PyxisSessionConfiguration, recordingKey: Swift::String?, journeyID: Swift::String, title: Swift::String, testName: Swift::String, producer: PyxisModel::PyxisRecordingProducer, executionID: Swift::String = UUID().uuidString, report: PyxisCore::PyxisBootstrapReport = .init(variants: [:]), attach: @escaping @_Concurrency::MainActor @Sendable (Foundation::Data, Swift::String) throws -> Swift::Void)
+  @_Concurrency::MainActor final public func updateReport(_ report: PyxisCore::PyxisBootstrapReport) throws
+  @_Concurrency::MainActor final public func declare(_ state: PyxisModel::PyxisState) throws
+  @_Concurrency::MainActor final public func capture(_ state: PyxisModel::PyxisState, png: Foundation::Data, width: Swift::Int, height: Swift::Int) throws
+  @_Concurrency::MainActor final public func beginTransition(from source: PyxisModel::PyxisState, to destination: PyxisModel::PyxisState, action: Swift::String, kind: Swift::String, key: Swift::String? = nil) throws -> Swift::Int
+  @_Concurrency::MainActor final public func succeedTransition(_ index: Swift::Int) throws
+  @_Concurrency::MainActor final public func fail(_ error: any Swift::Error, transition index: Swift::Int? = nil) throws
+  @_Concurrency::MainActor final public func finish(status: PyxisModel::PyxisObservationStatus, failure: Swift::String? = nil) throws
+  @_Concurrency::MainActor final public func checkpoint() throws
+  @objc deinit
+}
+public struct PyxisSessionConfiguration : Swift::Sendable {
+  public var project: PyxisModel::PyxisProject
+  public var run: PyxisModel::PyxisRunMetadata
+  public var domains: [PyxisModel::PyxisDomain]
+  public var profile: PyxisModel::PyxisProfile
+  public init(project: PyxisModel::PyxisProject, run: PyxisModel::PyxisRunMetadata, domains: [PyxisModel::PyxisDomain], profile: PyxisModel::PyxisProfile)
+}
+extension PyxisRecording::PyxisRecordingSession : Swift::Sendable {}

@@ -11,9 +11,9 @@ struct RecordingSizeTests {
 	func metadataExceedingPreviousCapsStillDecodesAndExtracts() async throws {
 		let workspace: ArtifactTestWorkspace = try .init()
 		let input: PyxisBundleInput = try workspace.recording("source")
-		var descriptor: Data = try PyxisArtifact().encoded()
+		var descriptor: Data = try PyxisArtifact(id: "large").encoded()
 		descriptor.append(Data(repeating: 32, count: 1_024 * 1_024))
-		expectNoDifference(try PyxisArtifact(data: descriptor), .init())
+		expectNoDifference(try PyxisArtifact(data: descriptor), .init(id: "large"))
 		try descriptor.write(to: input.root.appendingPathComponent("artifact.json"))
 		try BundleValidator.validate(document: input.document, root: input.root)
 

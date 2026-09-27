@@ -1,0 +1,25 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)
+// swift-module-flags: -target arm64-apple-macos14.0 -enable-objc-interop -language-mode 6 -O -enable-experimental-feature DebugDescriptionMacro -module-name PyxisTesting -package-name pyxis_swift
+// swift-module-flags-ignorable:  -formal-cxx-interoperability-mode=off -interface-compiler-version 6.4
+@_exported import PyxisCore/*.PyxisBootstrapReport*/
+@_exported import PyxisCore/*.PyxisRecordingEnvironment*/
+@_exported import PyxisModel
+@_exported import PyxisRecording
+import Swift
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+public struct PyxisSnapshotBaseline : Swift::Sendable {
+  public var directory: Swift::String
+  public var name: Swift::String
+  public var record: Swift::Bool
+  public init(directory: Swift::String, name: Swift::String, record: Swift::Bool = false)
+}
+public enum PyxisSnapshotError : Swift::Error, Swift::Sendable {
+  case outsideTest
+  case recordingInProgress
+  case timedOut
+  case invalidImage
+  case baseline(Swift::String)
+}

@@ -20,8 +20,8 @@ struct RecordingStoreRecoveryTests {
 		}
 		let current: PyxisStoredRecording? = try store.snapshot()
 		let snapshot: PyxisStoredRecording = try #require(current)
-		expectNoDifference(snapshot.bundle.document.observations.count, inputs.count)
-		try BundleValidator.validate(document: snapshot.bundle.document, root: store.root)
+		expectNoDifference(snapshot.recordings.flatMap { $0.document.observations }.count, inputs.count)
+		for input in snapshot.recordings { try BundleValidator.validate(document: input.document, root: store.root) }
 	}
 
 	@Test(arguments: ["store.json", "assets", "snapshots", "heads"])
@@ -49,14 +49,14 @@ struct RecordingStoreRecoveryTests {
 		}
 		if let baseline {
 			expectNoDifference(try store.snapshot()?.id, baseline.id)
-			try BundleValidator.validate(document: baseline.bundle.document, root: store.root)
+			for input in baseline.recordings { try BundleValidator.validate(document: input.document, root: store.root) }
 		} else {
 			#expect(!FileManager.default.fileExists(atPath: store.root.appendingPathComponent("heads/default.json").path))
 		}
 		expectNoDifference(try FileManager.default.contentsOfDirectory(atPath: store.root.appendingPathComponent(".runtime/staging").path), [])
 		let retried: PyxisStoredRecording = try store.update(input)
-		expectNoDifference(retried.bundle.document.run.id, "updated")
-		try BundleValidator.validate(document: retried.bundle.document, root: store.root)
+		expectNoDifference(retried.recordings[0].document.run.id, "updated")
+		for input in retried.recordings { try BundleValidator.validate(document: input.document, root: store.root) }
 	}
 
 	@Test(arguments: [false, true])

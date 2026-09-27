@@ -44,6 +44,8 @@ internal func exportResult(
 	)
 	var latest: [String: (revision: Int, input: PyxisBundleInput)] = [:]
 	var origins: [String: [String]] = [:]
+	var completed: Set<String> = []
+	var nativeTests: [String: String] = [:]
 
 	for test in tests {
 		for attachment in test.attachments {
@@ -58,6 +60,7 @@ internal func exportResult(
 				root: exported
 			)
 			let fragment: PyxisMapDocument = try PyxisJSON.decode(Data(contentsOf: attachmentURL))
+			try PyxisValidation.validate(fragment)
 
 			guard
 				fragment.format == .fragment,
@@ -67,11 +70,13 @@ internal func exportResult(
 			}
 
 			let observationID: String = Data(observation.id.utf8).base64EncodedString()
+			let argumentData: Data = try JSONEncoder().encode(attachment.arguments ?? [])
 			let origin: [String] = [
-				test.testIdentifier,
+				test.testIdentifierURL ?? test.testIdentifier,
 				attachment.configurationName,
 				attachment.deviceID,
 				String(attachment.repetitionNumber ?? 0),
+				String(decoding: argumentData, as: UTF8.self),
 			]
 
 			if let previousOrigin = origins[observationID], previousOrigin != origin {
@@ -81,6 +86,21 @@ internal func exportResult(
 			}
 
 			origins[observationID] = origin
+			nativeTests[observationID] = test.testIdentifierURL ?? test.testIdentifier
+			if observation.producer?.framework != "swift_testing", observation.status == .passed { completed.insert(observationID) }
+			if observation.producer?.framework == "swift_testing" {
+				let markers = test.attachments.filter {
+					originalAttachmentName($0.suggestedHumanReadableName) == "pyxis-completed-\(observation.id).txt"
+					&& $0.configurationName == attachment.configurationName
+					&& $0.deviceID == attachment.deviceID
+					&& $0.repetitionNumber == attachment.repetitionNumber
+					&& $0.arguments == attachment.arguments
+				}
+				if markers.count == 1, let marker = markers.first {
+					let data: Data = try .init(contentsOf: containedFile(marker.exportedFileName, root: exported))
+					if data == Data(observation.id.utf8) { completed.insert(observationID) }
+				}
+			}
 			if let previous = latest[observationID], previous.revision > revision { continue }
 
 			if let previous = latest[observationID], previous.revision == revision {
@@ -109,6 +129,7 @@ internal func exportResult(
 					&& $0.configurationName == attachment.configurationName
 					&& $0.deviceID == attachment.deviceID
 					&& $0.repetitionNumber == attachment.repetitionNumber
+					&& $0.arguments == attachment.arguments
 				}
 
 				guard
@@ -137,6 +158,23 @@ internal func exportResult(
 
 	guard !latest.isEmpty
 	else { throw CLIError.operation("No Pyxis fragments found in \(result.path)") }
+	var outcomes: [String: XCResultTestOutcome] = [:]
+	for (observationID, testID) in nativeTests {
+		if outcomes[testID] == nil {
+			let json: String = try await processOutput("/usr/bin/xcrun", [
+				"xcresulttool", "get", "test-results", "test-details", "--path", result.path, "--test-id", testID,
+			])
+			outcomes[testID] = try JSONDecoder().decode(XCResultTestOutcome.self, from: Data(json.utf8))
+		}
+		guard var entry = latest[observationID], let outcome = outcomes[testID] else { continue }
+		if entry.input.document.observations[0].status != .failed {
+			entry.input.document.observations[0].status = outcome.status(completed: completed.contains(observationID))
+			if entry.input.document.observations[0].status == .failed {
+				entry.input.document.observations[0].failure = "The enclosing native test failed."
+			}
+		}
+		latest[observationID] = entry
+	}
 
 	let document: PyxisMapDocument = try await publication.publish(
 		inputs: latest.values.map(\.input),

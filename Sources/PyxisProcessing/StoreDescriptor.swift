@@ -5,7 +5,7 @@ internal struct StoreDescriptor: Codable {
 	internal let version: Int
 	internal let projectID: String
 
-	internal init(format: String = "pyxis.store", version: Int = 1, projectID: String) {
+	internal init(format: String = "pyxis.store", version: Int = 2, projectID: String) {
 		self.format = format
 		self.version = version
 		self.projectID = projectID

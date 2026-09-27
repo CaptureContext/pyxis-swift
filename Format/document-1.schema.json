@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pyxis.invalid/format/document-1.schema.json",
+  "title": "Pyxis visualization document 1",
+  "type": "object",
+  "properties": {
+    "format": {
+      "const": "pyxis.document"
+    },
+    "version": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "recordings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^assets/[A-Za-z0-9._/-]+\\.pyx$"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "id",
+          "path",
+          "sha256"
+        ]
+      }
+    },
+    "pages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "recording_ids": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "recording_ids"
+        ]
+      }
+    }
+  },
+  "required": [
+    "format",
+    "version",
+    "id",
+    "title",
+    "recordings",
+    "pages"
+  ],
+  "$comment": "Page IDs must be unique. Every recording ID must resolve to an embedded immutable recording. Temporary comparisons and view settings are not serialized."
+}

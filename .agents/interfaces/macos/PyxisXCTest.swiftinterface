@@ -24,9 +24,10 @@ public struct PyxisRecordingConfiguration : Swift::Sendable {
   public var profile: PyxisModel::PyxisProfile
   @_hasInitialValue public var journeyID: Swift::String?
   @_hasInitialValue public var title: Swift::String?
+  @_hasInitialValue public var recordingKey: Swift::String?
   public var attempt: Swift::Int
   public var screenshotSource: PyxisXCTest::PyxisScreenshotSource
-  public init(project: PyxisModel::PyxisProject, run: PyxisModel::PyxisRunMetadata, domains: [PyxisModel::PyxisDomain], profile: PyxisModel::PyxisProfile, journeyID: Swift::String? = nil, title: Swift::String? = nil, attempt: Swift::Int = 0, screenshotSource: PyxisXCTest::PyxisScreenshotSource = .application)
+  public init(project: PyxisModel::PyxisProject, run: PyxisModel::PyxisRunMetadata, domains: [PyxisModel::PyxisDomain], profile: PyxisModel::PyxisProfile, journeyID: Swift::String? = nil, title: Swift::String? = nil, attempt: Swift::Int = 0, recordingKey: Swift::String? = nil, screenshotSource: PyxisXCTest::PyxisScreenshotSource = .application)
 }
 public enum PyxisScreenshotSource : Swift::Sendable {
   case application

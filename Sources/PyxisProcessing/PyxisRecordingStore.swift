@@ -27,10 +27,27 @@ public struct PyxisRecordingStore: Sendable {
 		let bytes: Data = try metadata(at: file("snapshots/\(id).json"))
 		guard StableID.sha256(bytes) == id
 		else { throw PyxisValidationError("Snapshot checksum mismatch") }
-		let document: PyxisMapDocument = try PyxisJSON.decode(bytes)
-		guard try Data(document.project.id.utf8) == Data(decodeDescriptor().projectID.utf8)
+		let documents = try decodeSnapshot(bytes)
+		let projectID = try decodeDescriptor().projectID
+		guard documents.values.allSatisfy({ Data($0.project.id.utf8) == Data(projectID.utf8) })
 		else { throw PyxisValidationError("Snapshot belongs to another project") }
-		return .init(id: id, bundle: .init(document: document, root: root))
+		return .init(id: id, recordings: documents.keys.sorted().map { .init(document: documents[$0]!, root: root) })
+	}
+
+	private func decodeSnapshot(_ data: Data) throws -> [String: PyxisMapDocument] {
+		// Explicitly migrated stores retain old snapshot bytes and IDs for historical references.
+		if let value = try JSONSerialization.jsonObject(with: data) as? [String: Any], value["format"] as? String == "pyxis.map" {
+			return try RecordingComposition().variations(PyxisJSON.decode(data))
+		}
+		let decoder = JSONDecoder()
+		decoder.dateDecodingStrategy = .iso8601
+		let snapshot = try decoder.decode(StoreSnapshot.self, from: data)
+		guard snapshot.format == "pyxis.store.snapshot", snapshot.version == 2, !snapshot.recordings.isEmpty else { throw PyxisValidationError("Unsupported store snapshot") }
+		for (scope, document) in snapshot.recordings {
+			let split = try RecordingComposition().variations(document)
+			guard split.count == 1, split[scope] != nil else { throw PyxisValidationError("Invalid variation replacement slot") }
+		}
+		return snapshot.recordings
 	}
 
 	/// Replaces passed journey/test + requested-variant scopes. Other scopes survive a merge.
@@ -40,21 +57,38 @@ public struct PyxisRecordingStore: Sendable {
 		context: String = "default",
 		policy: PyxisStorePolicy = .merge
 	) throws -> PyxisStoredRecording {
-		try update(input, context: context, policy: policy, writer: .init())
+		try update([input], context: context, policy: policy, writer: .init())
+	}
+
+	/// Commits every selected input under one lock and advances the context only after all writes succeed.
+	@discardableResult
+	public func update(_ inputs: [PyxisBundleInput], context: String = "default", policy: PyxisStorePolicy = .merge) throws -> PyxisStoredRecording {
+		try update(inputs, context: context, policy: policy, writer: .init())
+	}
+
+	@discardableResult
+	internal func update(_ input: PyxisBundleInput, context: String = "default", policy: PyxisStorePolicy = .merge, writer: StoreFileWriter) throws -> PyxisStoredRecording {
+		try update([input], context: context, policy: policy, writer: writer)
 	}
 
 	@discardableResult
 	internal func update(
-		_ input: PyxisBundleInput,
+		_ inputs: [PyxisBundleInput],
 		context: String = "default",
 		policy: PyxisStorePolicy = .merge,
 		writer: StoreFileWriter
 	) throws -> PyxisStoredRecording {
 		try validateContext(context)
-		try BundleValidator.validate(document: input.document, root: input.root)
-		guard input.document.format == .map, !input.document.observations.isEmpty,
-			input.document.observations.allSatisfy({ $0.status == .passed })
-		else { throw PyxisValidationError("Store updates require nonempty, passed recordings") }
+		guard let input = inputs.first else { throw PyxisValidationError("Store update needs recordings") }
+		var incoming: [String: PyxisMapDocument] = [:]
+		for value in inputs {
+			try BundleValidator.validate(document: value.document, root: value.root)
+			guard Data(value.document.project.id.utf8) == Data(input.document.project.id.utf8) else { throw PyxisValidationError("Store inputs belong to different applications") }
+			for (scope, document) in try RecordingComposition().variations(value.document) {
+				if let previous = incoming[scope], previous != document { throw PyxisValidationError("More than one input replaces the same variation") }
+				incoming[scope] = document
+			}
+		}
 		try prepareLock()
 		let lock: StoreLock = try .init(at: file(".runtime/write.lock"))
 		defer { withExtendedLifetime(lock) {} }
@@ -71,10 +105,23 @@ public struct PyxisRecordingStore: Sendable {
 			try FileManager.default.createDirectory(at: file(path), withIntermediateDirectories: true)
 		}
 		let previous: PyxisStoredRecording? = try snapshot(context: context)
-		let document: PyxisMapDocument = try RecordingComposition().compose(
-			previous: previous?.bundle.document, incoming: input.document, policy: policy
-		)
+		var documents: [String: PyxisMapDocument] = [:]
+		if policy == .merge, let previous {
+			for value in previous.recordings { documents.merge(try RecordingComposition().variations(value.document)) { _, new in new } }
+		}
+		documents.merge(incoming) { _, new in new }
+		var runs: [Data: PyxisRunMetadata] = [:]
+		for document in documents.values {
+			for run in [document.run] + document.recordingRuns {
+				let key: Data = .init(run.id.utf8)
+				if let previous = runs[key], previous != run {
+					throw PyxisValidationError("Conflicting metadata for one immutable recording run")
+				}
+				runs[key] = run
+			}
+		}
 		var prepared: Set<String> = []
+		for input in inputs {
 		for capture in input.document.captures where prepared.insert(capture.asset.path).inserted {
 			let asset: PyxisAsset = capture.asset
 			guard let hash = asset.sha256,
@@ -87,8 +134,9 @@ public struct PyxisRecordingStore: Sendable {
 				try writer.write(BundleValidator.assetData(asset, root: input.root), to: target, staging: staging)
 			}
 		}
-		try BundleValidator.validate(document: document, root: root)
-		let bytes: Data = try PyxisJSON.encode(document)
+		}
+		for document in documents.values { try BundleValidator.validate(document: document, root: root) }
+		let bytes: Data = try encode(StoreSnapshot(recordings: documents))
 		let id: String = StableID.sha256(bytes)
 		let snapshotFile: URL = try file("snapshots/\(id).json")
 		if FileManager.default.fileExists(atPath: snapshotFile.path) {
@@ -101,7 +149,7 @@ public struct PyxisRecordingStore: Sendable {
 			encode(StoreHead(snapshotID: id)),
 			to: file("heads/\(context).json"), staging: staging
 		)
-		return .init(id: id, bundle: .init(document: document, root: root))
+		return .init(id: id, recordings: documents.keys.sorted().map { .init(document: documents[$0]!, root: root) })
 	}
 
 	private func prepareLock() throws {
@@ -129,8 +177,8 @@ public struct PyxisRecordingStore: Sendable {
 
 	private func validateStore() throws {
 		let descriptor: StoreDescriptor = try decodeDescriptor()
-		guard descriptor.format == "pyxis.store", descriptor.version == 1, !descriptor.projectID.isEmpty
-		else { throw PyxisValidationError("Unsupported recording store") }
+		guard descriptor.format == "pyxis.store", descriptor.version == 2, !descriptor.projectID.isEmpty
+		else { throw PyxisValidationError("Unsupported recording store. For version 1 use pyxis store migrate --output <new-directory>") }
 	}
 
 	private func decodeDescriptor() throws -> StoreDescriptor {
@@ -165,7 +213,24 @@ public struct PyxisRecordingStore: Sendable {
 
 	private func encode<Value: Encodable>(_ value: Value) throws -> Data {
 		let encoder: JSONEncoder = .init()
+		encoder.dateEncodingStrategy = .iso8601
 		encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
 		return try encoder.encode(value)
+	}
+}
+
+private struct StoreSnapshot: Codable {
+	internal var format: String
+	internal var version: Int
+	internal var recordings: [String: PyxisMapDocument]
+
+	internal init(
+		recordings: [String: PyxisMapDocument],
+		format: String = "pyxis.store.snapshot",
+		version: Int = 2
+	) {
+		self.format = format
+		self.version = version
+		self.recordings = recordings
 	}
 }

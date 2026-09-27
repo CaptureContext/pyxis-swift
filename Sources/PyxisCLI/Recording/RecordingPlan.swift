@@ -11,6 +11,23 @@ internal struct RecordingPlan: Encodable {
 		self.selections = selections
 	}
 
+	internal func selecting(_ filters: [String]) throws -> Self {
+		var constraints: [String: String] = [:]
+		for filter in filters {
+			let parts = filter.split(separator: "=", maxSplits: 1, omittingEmptySubsequences: false)
+			guard parts.count == 2, !parts[0].isEmpty, !parts[1].isEmpty,
+				constraints[String(parts[0])] == nil
+			else { throw CLIError.operation("Each --variant must be a unique key=value constraint.") }
+			constraints[String(parts[0])] = String(parts[1])
+		}
+		let selected = selections.filter { selection in
+			constraints.allSatisfy { selection.values[$0.key] == $0.value }
+		}
+		guard !selected.isEmpty else { throw CLIError.operation("No configured variations match the selection.") }
+		let names = Set(selected.compactMap { $0.values["device"] })
+		return .init(devices: devices.filter { names.contains($0.name) }, skipped: skipped, selections: selected)
+	}
+
 	internal init(
 		requests: [RecordingDeviceConfiguration],
 		deviceTypes: [SimulatorDeviceType],

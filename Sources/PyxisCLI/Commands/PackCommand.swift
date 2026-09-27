@@ -23,7 +23,7 @@ internal struct PackCommand: ParsableCommand {
 	internal func run() throws {
 		let session: BundleInputSession = try .init(paths: [input])
 		defer { withExtendedLifetime(session) {} }
-		try PyxisArchive().write(session.inputs[0], to: URL(fileURLWithPath: output))
+		try PyxisArchive().write(session.inputs, to: URL(fileURLWithPath: output))
 		print("Archive: \(output)")
 	}
 }

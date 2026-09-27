@@ -29,6 +29,20 @@
             buildForAnalyzing = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "1C90491ABD2477275F0C6367"
+               BuildableName = "PyxisExampleSnapshotTests.xctest"
+               BlueprintName = "PyxisExampleSnapshotTests"
+               ReferencedContainer = "container:PyxisExample.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "94AF2B098B0463ABD5A4F4AD"
                BuildableName = "PyxisExampleUITests.xctest"
                BlueprintName = "PyxisExampleUITests"
@@ -86,6 +100,17 @@
                BlueprintIdentifier = "17DE232D72AB7B5E9723F618"
                BuildableName = "PyxisRuntimeTests.xctest"
                BlueprintName = "PyxisRuntimeTests"
+               ReferencedContainer = "container:PyxisExample.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "1C90491ABD2477275F0C6367"
+               BuildableName = "PyxisExampleSnapshotTests.xctest"
+               BlueprintName = "PyxisExampleSnapshotTests"
                ReferencedContainer = "container:PyxisExample.xcodeproj">
             </BuildableReference>
          </TestableReference>

@@ -17,6 +17,15 @@ internal struct RecordCommand: AsyncParsableCommand {
 	@Flag(name: .long, help: "Reuse the configured derived_data directory. Omit after source or dependency changes.")
 	internal var skipBuild: Bool = false
 
+	@Option(name: .long, help: "Override the configured test selection. Repeat for several test identifiers.")
+	internal var onlyTesting: [String] = []
+
+	@Option(name: .long, help: "Select configured variations by key=value. Repeat to constrain more dimensions.")
+	internal var variant: [String] = []
+
+	@Flag(name: .long, help: "Explicitly update the configured shared store after the entire selection succeeds.")
+	internal var updateStore: Bool = false
+
 	internal init() {}
 
 	internal func validate() throws {
@@ -29,12 +38,18 @@ internal struct RecordCommand: AsyncParsableCommand {
 			yaml: String(contentsOf: file, encoding: .utf8)
 		)
 		try configuration.validate()
+		if configuration.coverage != nil {
+			printProgress("Warning: coverage.states is deprecated and ignored. Tests and native recording outcomes determine success.")
+		}
+		guard !updateStore || configuration.storage != nil
+		else { throw CLIError.operation("--update-store requires storage in the configuration.") }
+		for selector in onlyTesting { try requireNonempty(selector, name: "--only-testing") }
 		let runner: RecordingRunner = .init(configuration: configuration, directory: file.deletingLastPathComponent())
-		let plan: RecordingPlan = try await runner.resolvePlan()
+		let plan: RecordingPlan = try await runner.resolvePlan().selecting(variant)
 		let encoder: JSONEncoder = .init()
 		encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
 		printProgress(String(decoding: try encoder.encode(plan), as: UTF8.self))
 		guard !list else { return }
-		try await runner.record(plan: plan, skipBuild: skipBuild)
+		try await runner.record(plan: plan, skipBuild: skipBuild, onlyTesting: onlyTesting, updateStore: updateStore)
 	}
 }

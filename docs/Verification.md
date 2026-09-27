@@ -1,5 +1,14 @@
 # Verification history
 
+## Recording composition and viewer integration, 2026-09-27
+
+- The package suite passed 108 tests, including native-result promotion, whole-variation replacement, atomic selected updates, nested archive extraction, shared envelope fixtures, and explicit legacy migration. Migration preserves historical store revision IDs and leaves the old store intact.
+- The Example passed a fresh iOS Simulator build-for-testing. A snapshot-only dark/LTR/large recording produced four states and four captures. A mixed light/LTR/large run produced four observations, seven states and seven captures across Swift Testing and XCTest. Explicit store update succeeded; both runner-owned simulators were removed.
+- The frontend opened that Swift-produced mixed archive and exported a `.pyxis` document. The Swift CLI validated the returned document as four recordings with seven captures.
+- The frontend passed 244 tests, type checking and a production build. Browser checks covered the original logo/floating controls, migration prompt, local document save and reload, command-palette source selection, temporary union comparison, all-capture inspection, and two graphs on one canvas. Canvas display data is never serialized as test evidence.
+- Eight macOS and seven iOS public interfaces were generated. Format directories match exactly. Existing interface-generation warnings about library evolution and scoped imports remain.
+- Self-hosted deployment, authentication, saved comparisons and semantic deduplication remain outside this implementation. Merge and optimization still require compatible recording manifests from one run; use composition for independent runs. The full Example device/profile matrix and older Xcode versions were not exercised in this pass.
+
 ## Swift 6.2 and documentation audit, 2026-09-16
 
 - The Swift 6.2 package baseline, async Subprocess execution and ordered variant storage passed 98 package tests using the installed Swift 6.4 toolchain. Cancellation checks covered child-process termination, temporary-simulator cleanup and preservation of the last published bundle.

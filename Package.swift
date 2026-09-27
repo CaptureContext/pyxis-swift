@@ -7,6 +7,14 @@ let package = Package(
 	platforms: [.iOS(.v17), .macOS(.v14)],
 	products: [
 		.library(
+			name: "PyxisRecording",
+			targets: ["PyxisRecording"]
+		),
+		.library(
+			name: "PyxisTesting",
+			targets: ["PyxisTesting"]
+		),
+		.library(
 			name: "PyxisCore",
 			targets: ["PyxisCore"]
 		),
@@ -36,6 +44,10 @@ let package = Package(
 		),
 	],
 	dependencies: [
+		.package(
+			url: "https://github.com/pointfreeco/swift-snapshot-testing",
+			.upToNextMajor(from: "1.19.4")
+		),
 		.package(
 			url: "https://github.com/swiftlang/swift-subprocess",
 			.upToNextMajor(from: "1.0.0")
@@ -67,6 +79,22 @@ let package = Package(
 	],
 
 	targets: [
+		.target(
+			name: "PyxisRecording",
+			dependencies: [
+				.target(name: "PyxisCore"),
+				.target(name: "PyxisModel"),
+			]
+		),
+		.target(
+			name: "PyxisTesting",
+			dependencies: [
+				.target(name: "PyxisRecording"),
+				.target(name: "PyxisCore"),
+				.target(name: "PyxisModel"),
+				.product(name: "SnapshotTesting", package: "swift-snapshot-testing"),
+			]
+		),
 		.target(
 			name: "PyxisCore",
 			dependencies: [
@@ -119,7 +147,7 @@ let package = Package(
 					condition: nil
 				),
 				.target(
-					name: "PyxisProcessing",
+					name: "PyxisRecording",
 					condition: nil
 				),
 			]
@@ -169,6 +197,13 @@ let package = Package(
 					name: "pyxis",
 					condition: nil
 				),
+			]
+		),
+		.testTarget(
+			name: "PyxisRecordingTests",
+			dependencies: [
+				.target(name: "PyxisRecording"),
+				.product(name: "CustomDump", package: "swift-custom-dump"),
 			]
 		),
 		.testTarget(

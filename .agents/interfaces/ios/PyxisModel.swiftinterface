@@ -2,6 +2,7 @@
 // swift-compiler-version: Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)
 // swift-module-flags: -target arm64-apple-ios17.0-simulator -enable-objc-interop -language-mode 6 -O -enable-experimental-feature DebugDescriptionMacro -module-name PyxisModel -package-name pyxis_swift
 // swift-module-flags-ignorable:  -formal-cxx-interoperability-mode=off -interface-compiler-version 6.4
+import CryptoKit
 import Foundation
 import OrderedCollections
 import Swift
@@ -12,20 +13,39 @@ public struct PyxisArtifact : Swift::Codable, Swift::Equatable, Swift::Sendable 
   public var format: Swift::String
   public var version: Swift::Int
   public var type: PyxisModel::PyxisArtifactType
-  @inlinable public init(format: Swift::String = "pyxis.artifact", version: Swift::Int = 1, type: PyxisModel::PyxisArtifactType = .regular) {
+  @_hasInitialValue public var id: Swift::String?
+  public var recordings: [PyxisModel::PyxisArtifactReference]
+  @inlinable public init(format: Swift::String = "pyxis.artifact", version: Swift::Int = 2, type: PyxisModel::PyxisArtifactType = .regular, id: Swift::String? = nil, recordings: [PyxisModel::PyxisArtifactReference] = []) {
 		self.format = format
 		self.version = version
 		self.type = type
+		self.id = id
+		self.recordings = recordings
 	}
-  public init(data: Foundation::Data) throws
-  public func validate() throws
+  public init(from decoder: any Swift::Decoder) throws
+  public init(data: Foundation::Data, allowLegacy: Swift::Bool = false) throws
+  public func validate(allowLegacy: Swift::Bool = false) throws
   public func encoded() throws -> Foundation::Data
   @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisModel::PyxisArtifact, _ b: PyxisModel::PyxisArtifact) -> Swift::Bool
+  public func encode(to encoder: any Swift::Encoder) throws
+}
+public struct PyxisArtifactReference : Swift::Codable, Swift::Equatable, Swift::Sendable {
+  public var id: Swift::String
+  public var path: Swift::String
+  public var sha256: Swift::String
+  @inlinable public init(id: Swift::String, path: Swift::String, sha256: Swift::String) {
+		self.id = id
+		self.path = path
+		self.sha256 = sha256
+	}
+  public static func validate(_ references: [PyxisModel::PyxisArtifactReference]) throws
+  @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisModel::PyxisArtifactReference, _ b: PyxisModel::PyxisArtifactReference) -> Swift::Bool
   public func encode(to encoder: any Swift::Encoder) throws
   public init(from decoder: any Swift::Decoder) throws
 }
 public enum PyxisArtifactType : Swift::String, Swift::Codable, Swift::Sendable {
   case regular
+  case composition
   @inlinable public init?(rawValue: Swift::String)
   public typealias RawValue = Swift::String
   public var rawValue: Swift::String {
@@ -142,7 +162,9 @@ public struct PyxisObservation : Swift::Codable, Swift::Equatable, Swift::Sendab
   @_hasInitialValue public var startedAt: Foundation::Date?
   @_hasInitialValue public var failure: Swift::String?
   @_hasInitialValue public var runID: Swift::String?
-  @inlinable public init(id: Swift::String, journeyID: Swift::String, title: Swift::String, testName: Swift::String, profileID: Swift::String, status: PyxisModel::PyxisObservationStatus = .incomplete, variants: [Swift::String : PyxisModel::PyxisVariantResult] = [:], startedAt: Foundation::Date? = nil, failure: Swift::String? = nil, runID: Swift::String? = nil) {
+  @_hasInitialValue public var recordingKey: Swift::String?
+  @_hasInitialValue public var producer: PyxisModel::PyxisRecordingProducer?
+  @inlinable public init(id: Swift::String, journeyID: Swift::String, title: Swift::String, testName: Swift::String, profileID: Swift::String, status: PyxisModel::PyxisObservationStatus = .incomplete, variants: [Swift::String : PyxisModel::PyxisVariantResult] = [:], startedAt: Foundation::Date? = nil, failure: Swift::String? = nil, runID: Swift::String? = nil, recordingKey: Swift::String? = nil, producer: PyxisModel::PyxisRecordingProducer? = nil) {
 		self.id = id
 		self.journeyID = journeyID
 		self.title = title
@@ -153,6 +175,8 @@ public struct PyxisObservation : Swift::Codable, Swift::Equatable, Swift::Sendab
 		self.startedAt = startedAt
 		self.failure = failure
 		self.runID = runID
+		self.recordingKey = recordingKey
+		self.producer = producer
 	}
   public init(from decoder: any Swift::Decoder) throws
   public func encode(to encoder: any Swift::Encoder) throws
@@ -194,6 +218,14 @@ public struct PyxisProject : Swift::Codable, Swift::Equatable, Swift::Sendable {
   public func encode(to encoder: any Swift::Encoder) throws
   public init(from decoder: any Swift::Decoder) throws
 }
+public struct PyxisRecordingProducer : Swift::Codable, Swift::Equatable, Swift::Sendable {
+  public var framework: Swift::String
+  public var captureMethod: Swift::String
+  public init(framework: Swift::String, captureMethod: Swift::String)
+  @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisModel::PyxisRecordingProducer, _ b: PyxisModel::PyxisRecordingProducer) -> Swift::Bool
+  public func encode(to encoder: any Swift::Encoder) throws
+  public init(from decoder: any Swift::Decoder) throws
+}
 public struct PyxisRunMetadata : Swift::Codable, Swift::Equatable, Swift::Sendable {
   public var id: Swift::String
   public var createdAt: Foundation::Date
@@ -229,6 +261,7 @@ public struct PyxisState : Swift::Codable, Swift::Equatable, Swift::Sendable {
   public init(from decoder: any Swift::Decoder) throws
 }
 public struct PyxisTransition : Swift::Codable, Swift::Equatable, Swift::Sendable {
+  @_hasInitialValue public var key: Swift::String?
   public var id: Swift::String
   public var observationID: Swift::String
   public var fromStateID: Swift::String
@@ -238,7 +271,8 @@ public struct PyxisTransition : Swift::Codable, Swift::Equatable, Swift::Sendabl
   public var sequence: Swift::Int
   public var status: PyxisModel::PyxisTransitionStatus
   @_hasInitialValue public var failure: Swift::String?
-  @inlinable public init(id: Swift::String, observationID: Swift::String, fromStateID: Swift::String, toStateID: Swift::String, action: Swift::String, kind: Swift::String, sequence: Swift::Int, status: PyxisModel::PyxisTransitionStatus, failure: Swift::String? = nil) {
+  @inlinable public init(id: Swift::String, observationID: Swift::String, fromStateID: Swift::String, toStateID: Swift::String, action: Swift::String, kind: Swift::String, sequence: Swift::Int, status: PyxisModel::PyxisTransitionStatus, failure: Swift::String? = nil, key: Swift::String? = nil) {
+		self.key = key
 		self.id = id
 		self.observationID = observationID
 		self.fromStateID = fromStateID
@@ -490,6 +524,47 @@ public struct PyxisVariants : Swift::Codable, Swift::Equatable, Swift::Sendable,
   public typealias Iterator = OrderedCollections::OrderedDictionary<Swift::String, Swift::String>.OrderedCollections::Iterator
   public typealias Key = Swift::String
   public typealias Value = Swift::String
+}
+public struct PyxisVisualizationDocument : Swift::Codable, Swift::Equatable, Swift::Sendable {
+  public var format: Swift::String
+  public var version: Swift::Int
+  public var id: Swift::String
+  public var title: Swift::String
+  public var recordings: [PyxisModel::PyxisArtifactReference]
+  public var pages: [PyxisModel::PyxisPage]
+  @inlinable public init(id: Swift::String, title: Swift::String, recordings: [PyxisModel::PyxisArtifactReference], pages: [PyxisModel::PyxisPage], format: Swift::String = "pyxis.document", version: Swift::Int = 1) {
+		self.format = format
+		self.version = version
+		self.id = id
+		self.title = title
+		self.recordings = recordings
+		self.pages = pages
+	}
+  public init(data: Foundation::Data) throws
+  public func validate() throws
+  @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisModel::PyxisVisualizationDocument, _ b: PyxisModel::PyxisVisualizationDocument) -> Swift::Bool
+  public func encode(to encoder: any Swift::Encoder) throws
+  public init(from decoder: any Swift::Decoder) throws
+}
+public struct PyxisPage : Swift::Codable, Swift::Equatable, Swift::Sendable {
+  public var id: Swift::String
+  public var title: Swift::String
+  public var recordingIDs: [Swift::String]
+  @inlinable public init(id: Swift::String, title: Swift::String, recordingIDs: [Swift::String]) {
+		self.id = id
+		self.title = title
+		self.recordingIDs = recordingIDs
+	}
+  @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_struct_equals(_ a: PyxisModel::PyxisPage, _ b: PyxisModel::PyxisPage) -> Swift::Bool
+  public func encode(to encoder: any Swift::Encoder) throws
+  public init(from decoder: any Swift::Decoder) throws
+}
+public enum StableID {
+  public static func digest(parts: [Swift::String]) -> Swift::String
+  public static func observation(projectID: Swift::String, runID: Swift::String, journeyID: Swift::String, testName: Swift::String, profileID: Swift::String, attempt: Swift::Int) -> Swift::String
+  public static func capture(observationID: Swift::String, stateID: Swift::String, occurrence: Swift::Int) -> Swift::String
+  public static func transition(observationID: Swift::String, sequence: Swift::Int) -> Swift::String
+  public static func sha256(_ data: Foundation::Data) -> Swift::String
 }
 extension PyxisModel::PyxisArtifactType : Swift::Equatable {}
 extension PyxisModel::PyxisArtifactType : Swift::Hashable {}

@@ -11,12 +11,12 @@ internal final class BundleInputSession {
 			.appendingPathComponent("pyxis-inputs-\(UUID().uuidString)")
 		self.temporary = temporary
 		do {
-			self.inputs = try paths.enumerated().map { index, path in
+			self.inputs = try paths.enumerated().flatMap { index, path -> [PyxisBundleInput] in
 				let url: URL = .init(fileURLWithPath: path)
-				if ["pyx", "zip"].contains(url.pathExtension.lowercased()) {
-					return try PyxisArchive().extract(from: url, to: temporary.appendingPathComponent(String(index)))
+				if ["pyx", "pyxis", "zip"].contains(url.pathExtension.lowercased()) {
+					return try PyxisArchive().extractRecordings(from: url, to: temporary.appendingPathComponent(String(index)))
 				}
-				return try loadBundleInput(path)
+				return try [loadBundleInput(path)]
 			}
 		} catch {
 			// Keep the input error if cleanup fails.

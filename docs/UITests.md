@@ -4,7 +4,7 @@ PyxisXCTest provides the same recorder through composition and an optional XCTes
 
 ## Existing test classes
 
-Keep your existing base class and pass its test instance and XCUIApplication to PyxisRecorder. Use a PyxisRecordingConfiguration containing project, shared run metadata, domains, profile and optional journey identity/title. Omitted journey identity and title default to XCTest's test name. Supply explicit IDs if they must survive test renaming. A run must use consistent ID, timestamp and provenance across tests; attempts distinguish retries.
+Keep your existing base class and pass its test instance and XCUIApplication to PyxisRecorder. Use a PyxisRecordingConfiguration containing project, shared run metadata, domains, profile and optional journey identity/title. Omitted journey identity and title default to XCTest's test name. Supply explicit IDs if they must survive test renaming. A run must use consistent ID, timestamp and provenance across tests. Each recorder creates a unique execution identity, incorporating the configured attempt. An optional `recordingKey` controls store replacement independently of the XCTest method name.
 
 Create the recorder before recording checkpoints. If the app is already running, skip launch configuration and optionally supply its observed report. Launch-time variants cannot be retroactively applied by the recorder.
 

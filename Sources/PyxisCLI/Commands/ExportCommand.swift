@@ -9,7 +9,7 @@ internal struct ExportCommand: AsyncParsableCommand {
 
 	@Option(
 		name: .long,
-		help: "Existing XCTest result bundle containing Pyxis attachments."
+		help: "Existing Xcode result bundle containing Pyxis attachments."
 	)
 	internal var xcresult: String
 

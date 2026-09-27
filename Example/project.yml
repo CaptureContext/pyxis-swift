@@ -4,6 +4,9 @@ options:
   deploymentTarget:
     iOS: '17.0'
 packages:
+  Pyxis:
+    path: ..
+    excludeFromProject: true
   Example:
     path: .
     excludeFromProject: true
@@ -43,10 +46,22 @@ targets:
         OTHER_SWIFT_FLAGS: '$(inherited) -package-name pyxis_swift'
     dependencies:
       - target: PyxisExample
+      - package: Pyxis
+        product: PyxisCore
+      - package: Pyxis
+        product: PyxisModel
+  PyxisExampleSnapshotTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [SnapshotTests, MapTestSupport]
+    dependencies:
+      - target: PyxisExample
+      - package: Example
+        product: ExampleSnapshotTesting
   PyxisExampleUITests:
     type: bundle.ui-testing
     platform: iOS
-    sources: [UITests]
+    sources: [UITests, MapTestSupport]
     dependencies:
       - target: PyxisExample
       - package: Example
@@ -58,6 +73,7 @@ schemes:
         PyxisExample: all
         PyxisExampleUITests: [test]
         PyxisRuntimeTests: [test]
+        PyxisExampleSnapshotTests: [test]
     test:
-      targets: [PyxisExampleUITests, PyxisRuntimeTests]
+      targets: [PyxisExampleUITests, PyxisRuntimeTests, PyxisExampleSnapshotTests]
       gatherCoverageData: false

@@ -1,0 +1,13 @@
+{
+  "format": "pyxis.artifact",
+  "version": 2,
+  "type": "composition",
+  "id": "composition-1",
+  "recordings": [
+    {
+      "id": "recording-1",
+      "path": "assets/child.pyx",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ]
+}

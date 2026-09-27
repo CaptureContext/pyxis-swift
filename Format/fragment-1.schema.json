@@ -331,6 +331,27 @@
         "run_id": {
           "type": "string",
           "minLength": 1
+        },
+        "recording_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "producer": {
+          "type": "object",
+          "properties": {
+            "framework": {
+              "type": "string",
+              "minLength": 1
+            },
+            "capture_method": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "framework",
+            "capture_method"
+          ]
         }
       },
       "required": [
@@ -455,6 +476,10 @@
         },
         "failure": {
           "type": "string"
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
         }
       },
       "required": [

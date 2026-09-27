@@ -3,7 +3,7 @@ import Foundation
 import UIKit
 import XCTest
 import PyxisModel
-import PyxisProcessing
+import PyxisRecording
 import PyxisCore
 import AsyncXCUIAutomation
 
@@ -11,13 +11,12 @@ import AsyncXCUIAutomation
 public final class PyxisRecorder {
 	private let testCase: XCTestCase
 	private let screenshotSource: PyxisScreenshotSource
-	private var sequence: Int
-	private var revision: Int
-	private var isFinished: Bool
+	private let session: PyxisRecordingSession
+	private var isFinished: Bool { session.isFinished }
 	private var isRecording: Bool
 	/// The recorded application, available to app-specific recorder extensions.
 	public let app: XCUIApplication
-	public private(set) var document: PyxisMapDocument
+	public var document: PyxisMapDocument { session.document }
 
 	public convenience init(
 		testCase: XCTestCase,
@@ -36,7 +35,8 @@ public final class PyxisRecorder {
 			title: configuration.title ?? testCase.name,
 			attempt: configuration.attempt,
 			report: report,
-			screenshotSource: configuration.screenshotSource
+			screenshotSource: configuration.screenshotSource,
+			recordingKey: configuration.recordingKey
 		)
 	}
 
@@ -51,42 +51,28 @@ public final class PyxisRecorder {
 		title: String,
 		attempt: Int = 0,
 		report: PyxisBootstrapReport = .init(variants: [:]),
-		screenshotSource: PyxisScreenshotSource = .application
+		screenshotSource: PyxisScreenshotSource = .application,
+		recordingKey: String? = nil
 	) {
 		self.testCase = testCase
 		self.screenshotSource = screenshotSource
 		self.app = app
-		self.sequence = 0
-		self.revision = 0
-		self.isFinished = false
 		self.isRecording = false
-
-		let observationID = StableID.observation(
-			projectID: project.id,
-			runID: run.id,
+		self.session = .init(
+			configuration: .init(project: project, run: run, domains: domains, profile: profile),
+			recordingKey: recordingKey,
 			journeyID: journeyID,
+			title: title,
 			testName: testCase.name,
-			profileID: profile.id,
-			attempt: attempt
-		)
-
-		self.document = .init(
-			format: .fragment,
-			project: project,
-			run: run,
-			domains: domains,
-			profiles: [profile],
-			observations: [
-				.init(
-					id: observationID,
-					journeyID: journeyID,
-					title: title,
-					testName: testCase.name,
-					profileID: profile.id,
-					status: .incomplete,
-					variants: report.covering(profile.requested).variants
-				)
-			]
+			producer: .init(framework: "xctest", captureMethod: screenshotSource == .screen ? "screen" : "application"),
+			executionID: "\(attempt)-\(UUID().uuidString)",
+			report: report,
+			attach: { data, name in
+				let attachment: XCTAttachment = .init(data: data, uniformTypeIdentifier: name.hasSuffix(".png") ? "public.png" : "public.json")
+				attachment.name = name
+				attachment.lifetime = .keepAlways
+				testCase.add(attachment)
+			}
 		)
 
 		testCase.addTeardownBlock { [self] in
@@ -125,13 +111,11 @@ public final class PyxisRecorder {
 			app.launch()
 			try await ready()
 			if let report = try await readReport() {
-				storeReport(report)
+				try session.updateReport(report)
 			}
 			try Task.checkCancellation()
 		} catch {
-			document.observations[0].status = .failed
-			document.observations[0].failure = String(describing: error)
-			try attachFragment()
+			try session.fail(error)
 			throw error
 		}
 	}
@@ -146,7 +130,7 @@ public final class PyxisRecorder {
 	public func updateReport(_ report: PyxisBootstrapReport) throws {
 		guard !isRecording else { throw PyxisRecorderError.recordingInProgress }
 		guard !isFinished else { throw PyxisRecorderError.alreadyFinished }
-		storeReport(report)
+		try session.updateReport(report)
 	}
 
 	/// Consumer owns readiness; overlapping recording operations are rejected.
@@ -164,6 +148,7 @@ public final class PyxisRecorder {
 		to destination: PyxisState,
 		action: String,
 		kind: String = "navigation",
+		key: String? = nil,
 		ready: () throws -> Void = {},
 		perform: () throws -> Void
 	) throws {
@@ -174,6 +159,7 @@ public final class PyxisRecorder {
 			to: destination,
 			action: action,
 			kind: kind,
+			key: key,
 			ready: ready,
 			perform: perform
 		)
@@ -193,6 +179,7 @@ public final class PyxisRecorder {
 		to destination: PyxisState,
 		action: String,
 		kind: String = "navigation",
+		key: String? = nil,
 		ready: @MainActor () async throws -> Void = {},
 		perform: @MainActor () async throws -> Void
 	) async throws {
@@ -203,6 +190,7 @@ public final class PyxisRecorder {
 			to: destination,
 			action: action,
 			kind: kind,
+			key: key,
 			ready: ready,
 			perform: perform
 		)
@@ -214,7 +202,7 @@ public final class PyxisRecorder {
 	) throws {
 		guard !isFinished else { throw PyxisRecorderError.alreadyFinished }
 
-		try declare(state)
+		try translateRecordingError { try session.declare(state) }
 		let failuresBefore = testCase.testRun?.totalFailureCount ?? 0
 
 		do {
@@ -223,9 +211,7 @@ public final class PyxisRecorder {
 			else { throw PyxisRecorderError.recordedXCTestFailure }
 		}
 		catch {
-			document.observations[0].status = .failed
-			document.observations[0].failure = String(describing: error)
-			try attachFragment()
+			try session.fail(error)
 			throw error
 		}
 
@@ -237,12 +223,15 @@ public final class PyxisRecorder {
 		to destination: PyxisState,
 		action: String,
 		kind: String = "navigation",
+		key: String? = nil,
 		ready: () throws -> Void = {},
 		perform: () throws -> Void
 	) throws {
 		guard !isFinished else { throw PyxisRecorderError.alreadyFinished }
 
-		let index = try beginTransition(from: source, to: destination, action: action, kind: kind)
+		let index = try translateRecordingError {
+			try session.beginTransition(from: source, to: destination, action: action, kind: kind, key: key)
+		}
 
 		do {
 			let failuresBefore = testCase.testRun?.totalFailureCount ?? 0
@@ -253,10 +242,7 @@ public final class PyxisRecorder {
 
 			try performCapture(destination, ready: ready)
 
-			document.transitions[index].status = .succeeded
-			document.transitions[index].failure = nil
-
-			try attachFragment()
+			try session.succeedTransition(index)
 		}
 		catch {
 			try failTransition(index, error: error)
@@ -275,11 +261,7 @@ public final class PyxisRecorder {
 		|| (testCase.testRun?.totalFailureCount ?? 0) > 0
 		|| document.observations[0].status == .failed
 
-		document.observations[0].status = hasFailure ? .failed : status
-		document.observations[0].failure = failure ?? document.observations[0].failure
-
-		try attachFragment()
-		isFinished = true
+		try session.finish(status: hasFailure ? .failed : status, failure: failure)
 	}
 
 	public func require(
@@ -296,7 +278,7 @@ public final class PyxisRecorder {
 	) async throws {
 		guard !isFinished else { throw PyxisRecorderError.alreadyFinished }
 
-		try declare(state)
+		try translateRecordingError { try session.declare(state) }
 		let failuresBefore = testCase.testRun?.totalFailureCount ?? 0
 
 		do {
@@ -307,9 +289,7 @@ public final class PyxisRecorder {
 			else { throw PyxisRecorderError.recordedXCTestFailure }
 		}
 		catch {
-			document.observations[0].status = .failed
-			document.observations[0].failure = String(describing: error)
-			try attachFragment()
+			try session.fail(error)
 			throw error
 		}
 
@@ -321,12 +301,15 @@ public final class PyxisRecorder {
 		to destination: PyxisState,
 		action: String,
 		kind: String = "navigation",
+		key: String? = nil,
 		ready: @MainActor () async throws -> Void,
 		perform: @MainActor () async throws -> Void
 	) async throws {
 		guard !isFinished else { throw PyxisRecorderError.alreadyFinished }
 
-		let index = try beginTransition(from: source, to: destination, action: action, kind: kind)
+		let index = try translateRecordingError {
+			try session.beginTransition(from: source, to: destination, action: action, kind: kind, key: key)
+		}
 
 		do {
 			let failuresBefore = testCase.testRun?.totalFailureCount ?? 0
@@ -339,10 +322,7 @@ public final class PyxisRecorder {
 
 			try await performCapture(destination, ready: ready)
 
-			document.transitions[index].status = .succeeded
-			document.transitions[index].failure = nil
-
-			try attachFragment()
+			try session.succeedTransition(index)
 		}
 		catch {
 			try failTransition(index, error: error)
@@ -364,12 +344,6 @@ public final class PyxisRecorder {
 		).encoded()
 	}
 
-	private func storeReport(_ report: PyxisBootstrapReport) {
-		document.observations[0].variants = report
-			.covering(document.profiles[0].requested)
-			.variants
-	}
-
 	private func beginOperation() throws {
 		guard !isFinished else { throw PyxisRecorderError.alreadyFinished }
 		guard !isRecording else { throw PyxisRecorderError.recordingInProgress }
@@ -384,84 +358,18 @@ public final class PyxisRecorder {
 	}
 
 	private func recordCapture(_ state: PyxisState) throws {
-		let screenshot = takeScreenshot()
-		let data = screenshot.pngRepresentation
-		let image = screenshot.image
-		let observationID = document.observations[0].id
-
-		let occurrence = document.captures
-			.filter { $0.stateID.utf8.elementsEqual(state.id.utf8) }
-			.count
-
-		let id = StableID.capture(
-			observationID: observationID,
-			stateID: state.id,
-			occurrence: occurrence
+		let screenshot: XCUIScreenshot = takeScreenshot()
+		let image: UIImage = screenshot.image
+		try session.capture(
+			state,
+			png: screenshot.pngRepresentation,
+			width: image.cgImage?.width ?? Int(image.size.width * image.scale),
+			height: image.cgImage?.height ?? Int(image.size.height * image.scale)
 		)
-
-		let attachment = XCTAttachment(
-			data: data,
-			uniformTypeIdentifier: "public.png"
-		)
-
-		attachment.name = "\(id).png"
-		attachment.lifetime = .keepAlways
-		testCase.add(attachment)
-		document.captures.append(.init(
-			id: id,
-			stateID: state.id,
-			observationID: observationID,
-			sequence: nextSequence(),
-			asset: .init(
-				path: "assets/\(id).png",
-				mediaType: .png,
-				width: image.cgImage?.width ?? Int(image.size.width * image.scale),
-				height: image.cgImage?.height ?? Int(image.size.height * image.scale)
-			)
-		))
-
-		try attachFragment()
-	}
-
-	private func beginTransition(
-		from source: PyxisState,
-		to destination: PyxisState,
-		action: String,
-		kind: String
-	) throws -> Int {
-		guard document.captures.contains(where: { $0.stateID.utf8.elementsEqual(source.id.utf8) })
-		else { throw PyxisRecorderError.sourceNotCaptured(source.id) }
-
-		try declare(source)
-		try declare(destination)
-
-		let sequence = nextSequence()
-		let index = document.transitions.count
-
-		document.transitions.append(.init(
-			id: StableID.transition(
-				observationID: document.observations[0].id,
-				sequence: sequence
-			),
-			observationID: document.observations[0].id,
-			fromStateID: source.id,
-			toStateID: destination.id,
-			action: action,
-			kind: kind,
-			sequence: sequence,
-			status: .failed,
-			failure: "Transition did not complete."
-		))
-
-		try attachFragment()
-
-		return index
 	}
 
 	private func failTransition(_ index: Int, error: any Error) throws {
-		document.transitions[index].failure = String(describing: error)
-		document.observations[0].status = .failed
-		document.observations[0].failure = String(describing: error)
+		try session.fail(error, transition: index)
 
 		let hierarchy = XCTAttachment(string: app.debugDescription)
 		hierarchy.name = "pyxis-failure-hierarchy"
@@ -472,43 +380,18 @@ public final class PyxisRecorder {
 		screenshot.name = "pyxis-failure-diagnostic"
 		screenshot.lifetime = .keepAlways
 		testCase.add(screenshot)
-
-		try attachFragment()
 	}
 
-	private func declare(_ state: PyxisState) throws {
-		let existing = document.states.first { $0.id.utf8.elementsEqual(state.id.utf8) }
-
-		if let existing {
-			let encoder = JSONEncoder()
-			encoder.outputFormatting = [.sortedKeys]
-
-			guard try encoder.encode(existing) == encoder.encode(state)
-			else { throw PyxisRecorderError.conflictingState(state.id) }
-			return
+	private func translateRecordingError<Value>(_ operation: () throws -> Value) throws -> Value {
+		do {
+			return try operation()
+		} catch PyxisRecordingError.sourceNotCaptured(let id) {
+			throw PyxisRecorderError.sourceNotCaptured(id)
+		} catch PyxisRecordingError.conflictingState(let id) {
+			throw PyxisRecorderError.conflictingState(id)
+		} catch PyxisRecordingError.alreadyFinished {
+			throw PyxisRecorderError.alreadyFinished
 		}
-
-		document.states.append(state)
-	}
-
-	private func nextSequence() -> Int {
-		defer { sequence += 1 }
-		return sequence
-	}
-
-	private func attachFragment() throws {
-		try PyxisValidation.validate(document)
-
-		let attachment = try XCTAttachment(
-			data: PyxisJSON.encode(document),
-			uniformTypeIdentifier: "public.json"
-		)
-
-		attachment.name = "pyxis-fragment-\(document.observations[0].id)-\(revision).json"
-		attachment.lifetime = .keepAlways
-
-		testCase.add(attachment)
-		revision += 1
 	}
 }
 #endif

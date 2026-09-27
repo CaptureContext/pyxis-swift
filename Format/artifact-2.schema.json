@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pyxis.invalid/format/artifact-2.schema.json",
+  "title": "Pyxis recording artifact 2",
+  "type": "object",
+  "properties": {
+    "format": {
+      "const": "pyxis.artifact"
+    },
+    "version": {
+      "const": 2
+    },
+    "type": {
+      "enum": [
+        "regular",
+        "composition"
+      ]
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "recordings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^assets/[A-Za-z0-9._/-]+\\.pyx$"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "id",
+          "path",
+          "sha256"
+        ]
+      }
+    }
+  },
+  "required": [
+    "format",
+    "version",
+    "type",
+    "id"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "composition"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "recordings"
+        ],
+        "properties": {
+          "recordings": {
+            "minItems": 1
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "recordings": {
+            "maxItems": 0
+          }
+        }
+      }
+    }
+  ],
+  "$comment": "Runtime validators additionally check path segments, duplicate keys/paths, identity conflicts, recursive reference closure, checksums and images."
+}
