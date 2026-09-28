@@ -20,7 +20,7 @@ extension PyxisRecordingConfiguration {
 			journeyID: journey.rawValue,
 			title: journey.title,
 			recordingKey: "journey.\(journey.rawValue)",
-			screenshotSource: .screen
+			screenshotSource: environment.deviceName == "iPhone Duo ID" ? .display(index: 1) : .screen
 		)
 	}
 

@@ -70,11 +70,27 @@ internal struct ExampleSnapshots {
 			$0.layoutDirection = profile.direction == .rtl ? .rightToLeft : .leftToRight
 			$0.preferredContentSizeCategory = profile.contentSize == .xxxLarge ? .extraExtraExtraLarge : .large
 		}
-		return .image(on: .init(
-			safeArea: window?.safeAreaInsets ?? .zero,
-			size: window?.bounds.size ?? UIScreen.main.bounds.size,
-			traits: traits
-		))
+		let bounds: CGSize = window?.bounds.size ?? UIScreen.main.bounds.size
+		let shortEdge: CGFloat = min(bounds.width, bounds.height)
+		let longEdge: CGFloat = max(bounds.width, bounds.height)
+		let size: CGSize = profile.orientation == .portrait
+		? .init(width: shortEdge, height: longEdge)
+		: .init(width: longEdge, height: shortEdge)
+		let viewStrategy: Snapshotting<UIView, UIImage> = .image(size: size, traits: traits)
+		var strategy: Snapshotting<UIViewController, UIImage> = viewStrategy.pullback { controller in
+			// Keep the fixture viewport independent of the host window's current rotation.
+			controller.view.autoresizingMask = []
+			controller.view.frame = .init(origin: .zero, size: size)
+			return controller.view
+		}
+		let snapshot = strategy.snapshot
+		strategy.snapshot = { controller in
+			snapshot(controller).map { image in
+				#expect((image.size.width > image.size.height) == (profile.orientation == .landscape))
+				return image
+			}
+		}
+		return strategy
 	}
 
 	private func controller<Content: View>(_ content: Content, profile: ExampleProfile) -> UIViewController {

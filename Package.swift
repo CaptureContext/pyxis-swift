@@ -209,6 +209,10 @@ let package = Package(
 		.testTarget(
 			name: "PyxisCLITests",
 			dependencies: [
+				.product(
+					name: "CustomDump",
+					package: "swift-custom-dump"
+				),
 				.target(
 					name: "pyxis",
 					condition: nil

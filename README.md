@@ -139,7 +139,7 @@ A domain groups a part of the app. A screen can have several states, such as an 
 >
 > Replace the state IDs and accessibility identifiers with your app's own values. The run ID and date are illustrative. Tests and profiles that will be combined must share a run ID, creation date and provenance dictionary. Use a new run ID for each execution and distinct `attempt` values for retries. State and journey IDs should remain stable when test methods are renamed.
 
-Recorded screenshots default to `.application`. Set `PyxisRecordingConfiguration.screenshotSource` to `.screen` to include system UI such as the software keyboard and system sheets. Failure diagnostics use the same source. The Notes example uses `.screen`.
+Recorded screenshots default to `.application`. Set `PyxisRecordingConfiguration.screenshotSource` to `.screen` to include system UI such as the software keyboard and system sheets. Failure diagnostics use the same source. Use `.display(index:)` to select another display by its zero-based index in `XCUIScreen.screens`. The Notes example uses `.screen`, or `.display(index: 1)` for its iPhone Duo ID profile.
 
 ### Dedicated and existing UI tests
 

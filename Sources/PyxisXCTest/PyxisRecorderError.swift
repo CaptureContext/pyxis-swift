@@ -1,5 +1,6 @@
 #if canImport(UIKit) && canImport(XCTest)
 public enum PyxisRecorderError: Error {
+	case unavailableScreen(index: Int, available: Int)
 	case sourceNotCaptured(String)
 	case readinessTimedOut(String)
 	case conflictingState(String)

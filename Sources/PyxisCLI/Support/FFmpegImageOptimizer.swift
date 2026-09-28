@@ -1,4 +1,5 @@
 import Foundation
+import ImageIO
 import PyxisModel
 import PyxisProcessing
 
@@ -21,10 +22,17 @@ internal struct FFmpegImageOptimizer {
 		asset: PyxisAsset,
 		bytes: Data
 	) async throws -> PyxisAssetContent {
-		guard asset.width > maximumWidth
+		let source = CGImageSourceCreateWithData(bytes as CFData, nil)
+		let properties = source.flatMap { CGImageSourceCopyPropertiesAtIndex($0, 0, nil) as? [CFString: Any] }
+		let orientation: Int = properties?[kCGImagePropertyOrientation] as? Int ?? 1
+		// ffmpeg applies EXIF orientation before scaling, including quarter-turn rotations.
+		let swapsDimensions: Bool = (5...8).contains(orientation)
+		let displayWidth: Int = swapsDimensions ? asset.height : asset.width
+		let displayHeight: Int = swapsDimensions ? asset.width : asset.height
+		guard displayWidth > maximumWidth
 		else { return .init(asset: asset, bytes: bytes) }
 
-		let height: Int = max(1, Int((Double(asset.height) * Double(maximumWidth) / Double(asset.width)).rounded()))
+		let height: Int = max(1, Int((Double(displayHeight) * Double(maximumWidth) / Double(displayWidth)).rounded()))
 		let suffix: String = asset.mediaType == .png ? "png" : "jpg"
 		let input: URL = scratch.appendingPathComponent("input.\(suffix)")
 		let output: URL = scratch.appendingPathComponent("assets/output.\(suffix)")

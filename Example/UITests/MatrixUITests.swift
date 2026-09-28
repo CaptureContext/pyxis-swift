@@ -10,7 +10,12 @@ internal final class MatrixUITests: XCTestCase {
 		try await recorder.transition(
 			from: .detail, to: .home, action: "Back to Notes", kind: "back",
 			ready: { try await recorder.requireExampleState(.home) },
-			perform: { recorder.app.navigationBars.buttons.element(boundBy: 0).tap() }
+			perform: {
+				// Duo places its back control in a toolbar outside the navigation bar.
+				let back: XCUIElement = recorder.app.buttons["BackButton"]
+				if back.exists { back.tap() }
+				else { recorder.app.navigationBars.buttons.element(boundBy: 0).tap() }
+			}
 		)
 		try await navigate(recorder, from: .home, to: .notebooks, button: .openNotebooks, action: "Browse notebooks")
 		try await navigate(recorder, from: .notebooks, to: .notebooksEmpty, button: .clearNotebook, action: "Clear notebook")
@@ -46,7 +51,10 @@ internal final class MatrixUITests: XCTestCase {
 		addTeardownBlock { @MainActor in app.terminate() }
 		try recorder.configureExampleDevice()
 		try await recorder.launch(
-			ready: { try await recorder.requireExampleState(.home) },
+			ready: {
+				try recorder.configureExampleOrientation()
+				try await recorder.requireExampleState(.home)
+			},
 			readReport: { try recorder.readExampleReport() }
 		)
 		let report: PyxisBootstrapReport = try recorder.readExampleReport()

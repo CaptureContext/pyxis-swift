@@ -15,7 +15,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/capturecontext/swift-async-xcuiautomation",
       "state" : {
-        "revision" : "177cf55a37571ae92783b7b7989b90121184ca93",
+        "revision" : "24747a5960da80b6c36750296ecee2182bc79c8e",
         "version" : "0.0.1"
       }
     },

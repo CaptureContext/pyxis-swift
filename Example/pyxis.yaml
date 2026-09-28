@@ -18,6 +18,7 @@ devices:
     optional: true
 # The first values and first device form the default viewer profile.
 variants:
+  orientation: [portrait, landscape]
   color_scheme: [dark, light]
   layout_direction: [ltr, rtl]
   accessibility.content_size: [large, xxx_large]

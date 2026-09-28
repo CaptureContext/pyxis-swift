@@ -64,7 +64,7 @@ AppPyxisTestCase and the states above belong to the consuming app. Example/UITes
 
 ## Screenshot source
 
-`PyxisRecordingConfiguration.screenshotSource` defaults to `.application`. Set it to `.screen` when a state includes system UI such as the software keyboard. Captures and failure diagnostics use the same source. This records the display rather than selecting a particular scene window.
+`PyxisRecordingConfiguration.screenshotSource` defaults to `.application`. Set it to `.screen` when a state includes system UI such as the software keyboard. Captures and failure diagnostics use the same source. For a device with multiple displays, use `.display(index:)` with the zero-based index in `XCUIScreen.screens`. An unavailable index throws `PyxisRecorderError.unavailableScreen` and records a failed observation. This records the display rather than selecting a particular scene window.
 
 ## Async behavior and failures
 

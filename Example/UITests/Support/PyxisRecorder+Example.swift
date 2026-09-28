@@ -4,6 +4,8 @@ import XCTest
 extension PyxisRecorder {
 	@MainActor
 	internal func configureExampleDevice() throws {
+		let orientation: String? = document.profiles[0].requested["orientation"]
+		XCUIDevice.shared.orientation = orientation == "landscape" ? .landscapeLeft : .portrait
 		let environment: PyxisRecordingEnvironment = try .init(environment: ProcessInfo.processInfo.environment)
 		app.launchEnvironment[PyxisRecordingEnvironment.Key.deviceModel.rawValue] = environment.deviceModel
 		?? ExampleDevice.simulatorModel
@@ -11,10 +13,32 @@ extension PyxisRecorder {
 	}
 
 	@MainActor
+	internal func configureExampleOrientation() throws {
+		let landscape: Bool = document.profiles[0].requested["orientation"] == "landscape"
+		let preferred: UIDeviceOrientation = landscape ? .landscapeLeft : .portrait
+		let alternate: UIDeviceOrientation = landscape ? .portrait : .landscapeLeft
+		// XCTest can report stale application bounds on Duo's internal display; inspect its window.
+		for orientation in [preferred, alternate, preferred] {
+			XCUIDevice.shared.orientation = orientation
+			let frame: CGRect = app.windows.firstMatch.frame
+			if (frame.width > frame.height) == landscape { return }
+		}
+		throw PyxisRecorderError.readinessTimedOut("Requested display orientation")
+	}
+
+	@MainActor
 	internal func readExampleReport() throws -> PyxisBootstrapReport {
 		let element: XCUIElement = app.staticTexts[.report]
 		try require(element)
-		return try .init(encoded: XCTUnwrap(element.value as? String))
+		var report: PyxisBootstrapReport = try .init(encoded: XCTUnwrap(element.value as? String))
+		if document.profiles[0].requested["orientation"] != nil {
+			let frame: CGRect = app.windows.firstMatch.frame
+			report.variants["orientation"] = .init(
+				status: .observed,
+				value: frame.width > frame.height ? "landscape" : "portrait"
+			)
+		}
+		return report
 	}
 
 	@MainActor
@@ -23,6 +47,10 @@ extension PyxisRecorder {
 		let element: XCUIElement = app.staticTexts[.ready(screen)]
 		try await require(element)
 		let requested: PyxisVariants = document.profiles[0].requested
+		if let orientation = requested["orientation"] {
+			let frame: CGRect = app.windows.firstMatch.frame
+			XCTAssertEqual(frame.width > frame.height ? "landscape" : "portrait", orientation, "Rendered orientation on \(state.screenID)")
+		}
 		let traits: [String] = [
 			PyxisVariantEntry.colorSchemeKey,
 			PyxisVariantEntry.layoutDirectionKey,

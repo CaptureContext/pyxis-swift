@@ -64,7 +64,7 @@ public final class PyxisRecorder {
 			journeyID: journeyID,
 			title: title,
 			testName: testCase.name,
-			producer: .init(framework: "xctest", captureMethod: screenshotSource == .screen ? "screen" : "application"),
+			producer: .init(framework: "xctest", captureMethod: screenshotSource == .application ? "application" : "screen"),
 			executionID: "\(attempt)-\(UUID().uuidString)",
 			report: report,
 			attach: { data, name in
@@ -209,13 +209,13 @@ public final class PyxisRecorder {
 			try ready()
 			guard (testCase.testRun?.totalFailureCount ?? 0) == failuresBefore
 			else { throw PyxisRecorderError.recordedXCTestFailure }
+
+			try recordCapture(state)
 		}
 		catch {
 			try session.fail(error)
 			throw error
 		}
-
-		try recordCapture(state)
 	}
 
 	private func performTransition(
@@ -287,13 +287,13 @@ public final class PyxisRecorder {
 			try Task.checkCancellation()
 			guard (testCase.testRun?.totalFailureCount ?? 0) == failuresBefore
 			else { throw PyxisRecorderError.recordedXCTestFailure }
+
+			try recordCapture(state)
 		}
 		catch {
 			try session.fail(error)
 			throw error
 		}
-
-		try recordCapture(state)
 	}
 
 	private func performTransition(
@@ -350,15 +350,20 @@ public final class PyxisRecorder {
 		isRecording = true
 	}
 
-	private func takeScreenshot() -> XCUIScreenshot {
+	private func takeScreenshot() throws -> XCUIScreenshot {
 		switch screenshotSource {
-		case .application: app.screenshot()
-		case .screen: XCUIScreen.main.screenshot()
+		case .application: return app.screenshot()
+		case .screen: return XCUIScreen.main.screenshot()
+		case let .display(index):
+			let screens = XCUIScreen.screens
+			guard screens.indices.contains(index)
+			else { throw PyxisRecorderError.unavailableScreen(index: index, available: screens.count) }
+			return screens[index].screenshot()
 		}
 	}
 
 	private func recordCapture(_ state: PyxisState) throws {
-		let screenshot: XCUIScreenshot = takeScreenshot()
+		let screenshot: XCUIScreenshot = try takeScreenshot()
 		let image: UIImage = screenshot.image
 		try session.capture(
 			state,
@@ -376,7 +381,13 @@ public final class PyxisRecorder {
 		hierarchy.lifetime = .keepAlways
 		testCase.add(hierarchy)
 
-		let screenshot = XCTAttachment(screenshot: takeScreenshot())
+		let screenshot: XCTAttachment
+		do {
+			screenshot = try XCTAttachment(screenshot: takeScreenshot())
+		}
+		catch {
+			screenshot = XCTAttachment(string: "Screenshot unavailable: \(error)")
+		}
 		screenshot.name = "pyxis-failure-diagnostic"
 		screenshot.lifetime = .keepAlways
 		testCase.add(screenshot)

@@ -25,7 +25,8 @@ internal extension ExampleProfile {
 		try self.init(
 			colorScheme: decode(ColorScheme.self, for: PyxisVariantEntry.colorSchemeKey),
 			direction: decode(LayoutDirection.self, for: PyxisVariantEntry.layoutDirectionKey),
-			contentSize: decode(ContentSize.self, for: PyxisVariantEntry.accessibilityContentSizeKey)
+			contentSize: decode(ContentSize.self, for: PyxisVariantEntry.accessibilityContentSizeKey),
+			orientation: decode(Orientation.self, for: "orientation")
 		)
 		guard values[PyxisVariantEntry.deviceKey] == environment.deviceName,
 			values[PyxisVariantEntry.subscriptionKey] == ExampleSubscription.trial.rawValue
@@ -40,14 +41,15 @@ internal extension ExampleProfile {
 		let model: String = environment.deviceModel ?? ExampleDevice.simulatorModel ?? "unknown"
 		let name: String = environment.deviceName ?? ExampleDevice.name(for: model)
 		let order: Int = environment.profileOrder
-		?? (name == ExampleDevice.iPhone18Pro.rawValue ? 0 : 8) + (colorScheme == .dark ? 0 : 4)
+		?? (name == ExampleDevice.iPhone18Pro.rawValue ? 0 : 16) + (orientation == .portrait ? 0 : 8) + (colorScheme == .dark ? 0 : 4)
 		+ (direction == .ltr ? 0 : 2) + (contentSize == .large ? 0 : 1)
 		let sizeTitle: String = contentSize == .xxxLarge ? "XXXL" : contentSize.rawValue.capitalized
 		return .init(
-			id: [name, colorScheme.rawValue, direction.rawValue, contentSize.rawValue].joined(separator: "."),
-			title: "\(name) · \(colorScheme.rawValue.capitalized) · \(direction.rawValue.uppercased()) · \(sizeTitle)",
+			id: [name, orientation.rawValue, colorScheme.rawValue, direction.rawValue, contentSize.rawValue].joined(separator: "."),
+			title: "\(name) · \(orientation.rawValue.capitalized) · \(colorScheme.rawValue.capitalized) · \(direction.rawValue.uppercased()) · \(sizeTitle)",
 			requested: [
 				.device(name),
+				.init(key: "orientation", value: orientation.rawValue),
 				.colorScheme(colorScheme),
 				.layoutDirection(direction),
 				.accessibility(.contentSize(contentSize)),

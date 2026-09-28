@@ -47,6 +47,7 @@ import _SwiftConcurrencyShims
   @objc deinit
 }
 public enum PyxisRecorderError : Swift::Error {
+  case unavailableScreen(index: Swift::Int, available: Swift::Int)
   case sourceNotCaptured(Swift::String)
   case readinessTimedOut(Swift::String)
   case conflictingState(Swift::String)
@@ -67,9 +68,10 @@ public struct PyxisRecordingConfiguration : Swift::Sendable {
   public var screenshotSource: PyxisXCTest::PyxisScreenshotSource
   public init(project: PyxisModel::PyxisProject, run: PyxisModel::PyxisRunMetadata, domains: [PyxisModel::PyxisDomain], profile: PyxisModel::PyxisProfile, journeyID: Swift::String? = nil, title: Swift::String? = nil, attempt: Swift::Int = 0, recordingKey: Swift::String? = nil, screenshotSource: PyxisXCTest::PyxisScreenshotSource = .application)
 }
-public enum PyxisScreenshotSource : Swift::Sendable {
+public enum PyxisScreenshotSource : Swift::Sendable, Swift::Hashable {
   case application
   case screen
+  case display(index: Swift::Int)
   @_semantics("derived_enum_equals") @_implements(Swift::Equatable, ==(_:_:)) public static func __derived_enum_equals(_ a: PyxisXCTest::PyxisScreenshotSource, _ b: PyxisXCTest::PyxisScreenshotSource) -> Swift::Bool
   public func hash(into hasher: inout Swift::Hasher)
   public var hashValue: Swift::Int {
@@ -100,5 +102,3 @@ public enum PyxisScreenshotSource : Swift::Sendable {
   @objc deinit
 }
 extension PyxisXCTest::PyxisRecorder : Swift::Sendable {}
-extension PyxisXCTest::PyxisScreenshotSource : Swift::Equatable {}
-extension PyxisXCTest::PyxisScreenshotSource : Swift::Hashable {}

@@ -56,4 +56,19 @@ open class ExampleSceneDelegate: UIResponder, UIWindowSceneDelegate {
 		self.window = window
 		window.makeKeyAndVisible()
 	}
+
+	public func sceneDidBecomeActive(_ scene: UIScene) {
+		#if DEBUG
+		guard
+			let windowScene = scene as? UIWindowScene,
+			let orientation = pyxisConfiguration.requested["orientation"]
+		else { return }
+		window?.rootViewController?.setNeedsUpdateOfSupportedInterfaceOrientations()
+		windowScene.requestGeometryUpdate(.iOS(
+			interfaceOrientations: orientation == "landscape" ? .landscapeLeft : .portrait
+		)) { error in
+			NSLog("Example orientation request failed: %@", String(describing: error))
+		}
+		#endif
+	}
 }

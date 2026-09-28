@@ -1,5 +1,7 @@
 import ArgumentParser
+import CustomDump
 import Foundation
+import ImageIO
 import PyxisModel
 import PyxisProcessing
 import Testing
@@ -119,6 +121,40 @@ struct OptimizationTests {
 		#expect(try PyxisJSON.encode(expected) == PyxisJSON.encode(published))
 		#expect(FileManager.default.fileExists(atPath: archive.path))
 		await #expect(throws: (any Error).self) { try await options.publish(inputs: [input], to: output) }
+	}
+
+	@Test(arguments: [2, 6])
+	func rotatedScreenshotsPreserveDisplayedAspectRatio(maximumWidth: Int) async throws {
+		let executable: URL
+		do { executable = try ffmpegExecutable(path: nil) }
+		catch { return } // ffmpeg is optional on machines running the package's unit tests.
+		let context: CGContext = try #require(CGContext(
+			data: nil, width: 4, height: 8, bitsPerComponent: 8, bytesPerRow: 16,
+			space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+		))
+		context.setFillColor(CGColor(red: 0, green: 0, blue: 1, alpha: 1))
+		context.fill(CGRect(x: 0, y: 0, width: 4, height: 8))
+		let image: CGImage = try #require(context.makeImage())
+		let bytes: NSMutableData = .init()
+		let destination = try #require(CGImageDestinationCreateWithData(bytes, "public.png" as CFString, 1, nil))
+		CGImageDestinationAddImage(destination, image, [kCGImagePropertyOrientation: 6] as CFDictionary)
+		try #require(CGImageDestinationFinalize(destination))
+
+		let folder: URL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+		defer { try! FileManager.default.removeItem(at: folder) }
+		let optimizer: FFmpegImageOptimizer = .init(
+			executable: executable, maximumWidth: maximumWidth, scratch: folder
+		)
+		let result: PyxisAssetContent = try await optimizer.optimize(
+			asset: .init(path: "assets/rotated.png", mediaType: .png, width: 4, height: 8),
+			bytes: bytes as Data
+		)
+		expectNoDifference(result.asset.width, maximumWidth)
+		expectNoDifference(result.asset.height, maximumWidth / 2)
+		let decoded = try #require(CGImageSourceCreateWithData(result.bytes as CFData, nil))
+		let output: CGImage = try #require(CGImageSourceCreateImageAtIndex(decoded, 0, nil))
+		expectNoDifference(output.width, maximumWidth)
+		expectNoDifference(output.height, maximumWidth / 2)
 	}
 
 	@Test

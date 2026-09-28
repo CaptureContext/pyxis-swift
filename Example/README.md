@@ -70,7 +70,9 @@ Matrix exports use these publication options before creating the ZIP:
 
 ffmpeg resizes each screenshot without changing its aspect ratio or enlarging smaller images. Apple's ImageIO encoder converts it to JPEG at quality `0.5` on its `0...1` scale. Transparent pixels are composited over white. All states, captures, transitions and profile metadata remain intact.
 
-The recording configuration uses `screenshotSource: .screen` to include the software keyboard. The keyboard state also waits until the keyboard is hittable; an app-only screenshot can omit this separate system window.
+The matrix includes portrait and landscape orientations. XCTest rotates the device and verifies the app’s rendered orientation for each checkpoint. The debug app also requests the matching scene geometry, which allows the Duo external display to rotate in the iOS 27.1 simulator. Fixture snapshots use an explicitly sized view and verify the resulting image orientation independently of the host window’s rotation.
+
+The recording configuration uses `screenshotSource: .screen` to include the software keyboard. The `iPhone Duo ID` profile uses `.display(index: 1)` for the internal display; open that display with Device Hub’s hinge control before recording. The keyboard state also waits until the keyboard is hittable; an app-only screenshot can omit this separate system window.
 
 The original full-resolution native test attachments remain in each device's `Tests.xcresult`; only the published images are reduced. Device bundles are merged without recompressing them. Import the single `recording.pyx` into the [Pyxis viewer](https://pyxis.capturecontext.dev).
 
